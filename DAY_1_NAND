@@ -1,0 +1,63 @@
+module Nand_gate (
+ input a,b,
+
+output y_not, y_and, y_or, y_nor, y_xor, y_xnor);
+
+//NOT gate
+assign y_not= ~(a&a); // NOT A using NAND
+//AND gate
+wire nand_and;
+assign nand_and= ~(a&b); // NAND of A and B
+assign y_and=~(nand_and & nand_and); // NAND output negated gives AND
+// OR gate
+wire notA, notB;
+assign notA = ~(a&a); // NOT A assign notB ~(b&b); // NOT B
+assign y_or = ~(notA & notB); // OR gate using NAND
+// NOR gate
+wire or_out;
+assign or_out = ~(notA & notB); // OR gate output
+assign y_nor = ~(or_out & or_out); // NAND output negated gives NOR
+//XOR gate
+wire AandnotB, notAandB;
+assign AandnotB = ~(a & notB); // A AND NOT Bing NAND
+assign notAandB = ~(notA &b); // NOT A AND Bueng NAND
+assign y_xor = (AandnotB & notAandB); // XOR using NAND
+// XNOR gate
+wire xor_out;
+assign xor_out = ~(AandnotB & notAandB); // XOR gate output 
+assign y_xnor  = ~(xor_out & xor_out); // Negated XOR given XNOR
+
+endmodule
+
+
+TEST BENCH :
+
+`timescale 1ns / 1ps
+//Date : 09/09/2024
+//Name : Charan Kopparla
+
+module Nand_gate_tb();
+     reg a, b;
+     wire y_not,y_and,y_or,y_nor,y_xor,y_xnor;
+     Nand_gate dut(a,b,y_not,y_and,y_or,y_nor,y_xor,y_xnor);
+     initial
+     begin 
+     a=0;b=0;
+     #10;
+     $display("a=%d,b=%d,y_not=%b,y_and=%b,y_or=%b,y_nor=%b,y_xor=%b,y_xnor=%b",a,b,y_not,y_and,y_or,y_nor,y_xor,y_xnor);
+    a=0;b=1;
+    #10;
+    $display("a=%d,b=%d,y_not=%b,y_and=%b,y_or=%b,y_nor=%b,y_xor=%b,y_xnor=%b",a,b,y_not,y_and,y_or,y_nor,y_xor,y_xnor);
+    a=1;b=0;
+    #10;
+    $display("a=%d,b=%d,y_not=%b,y_and=%b,y_or=%b,y_nor=%b,y_xor=%b,y_xnor=%b",a,b,y_not,y_and,y_or,y_nor,y_xor,y_xnor);
+    a=1;b=1;
+    #10
+    $display("a=%d,b=%d,y_not=%b,y_and=%b,y_or=%b,y_nor=%b,y_xor=%b,y_xnor=%b",a,b,y_not,y_and,y_or,y_nor,y_xor,y_xnor);
+   
+    end 
+    initial begin 
+    #50;
+    $finish();
+    end
+endmodule
