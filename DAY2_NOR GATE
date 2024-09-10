@@ -1,0 +1,58 @@
+RTL CODE :
+`timescale 1ns / 1ps
+//Date : 10/09/2024
+//Name : Charan Kopparla 
+
+
+module Nor_gate(
+ input a,b,
+ output y_not,y_or,y_and,y_nand,y_xor,y_xnor);
+ wire [12:0]w;
+ nor g1(y_not,a,a);
+ nor g2(w[0],a,b);
+ nor g3 (y_or,w[0],w[0]);//OR GATE
+ nor g4 (w[1],a,a);
+ nor g5 (w[2],b,b);
+ nor g6 (y_and,w[1],w[2]);//AND GATE
+ nor g7 (w[3],a,a);
+ nor g8 (w[4],b,b);
+ nor g9 (w[5],w[3],w[4]);
+ nor g10(y_nand,w[5],w[5]);//NAND GATE 
+ nor g11(w[6],a,b);
+ nor g12(w[7],a,w[6]);
+ nor g13(w[8],b,w[6]);
+ nor g14(y_xor,w[7],w[8]);//XOR GATE
+ nor g15(w[9],a,b);
+ nor g16(w[10],a,w[9]);
+ nor g17(w[11],b,w[9]);
+ nor g18(w[12],w[10],w[11]);
+ nor g19(y_xnor,w[12],w[12]);//XNOR GATE 
+ endmodule 
+
+
+TEST BENCH:
+`timescale 1ns / 1ps
+// Date : 10/09/2024
+// Name : Charan Kopparla 
+
+module Nor_gate_tb();
+reg a , b;
+wire y_not,y_and,y_or,y_nand,y_xor,y_xnor;
+Nor_gate dut(a,b,y_not,y_or,y_and,y_nand,y_xor,y_xnor);
+initial begin 
+a=0;b=0;
+#10;
+$display("a=%d,b=%d,y_not=%b,y_and=%b,y_or=%b,y_nand=%b,y_xor=%b,y_xnor=%b",a,b,y_not,y_and,y_or,y_nand,y_xor,y_xnor);
+a=0;b=1;
+#10;
+$display("a=%d,b=%d,y_not=%b,y_and=%b,y_or=%b,y_nand=%b,y_xor=%b,y_xnor=%b",a,b,y_not,y_and,y_or,y_nand,y_xor,y_xnor);
+a=1;b=0;
+#10;
+$display("a=%d,b=%d,y_not=%b,y_and=%b,y_or=%b,y_nand=%b,y_xor=%b,y_xnor=%b",a,b,y_not,y_and,y_or,y_nand,y_xor,y_xnor);
+a=1;b=1;
+#10;
+$display("a=%d,b=%d,y_not=%b,y_and=%b,y_or=%b,y_nand=%b,y_xor=%b,y_xnor=%b",a,b,y_not,y_and,y_or,y_nand,y_xor,y_xnor);
+#10;
+$finish();
+end
+endmodule
