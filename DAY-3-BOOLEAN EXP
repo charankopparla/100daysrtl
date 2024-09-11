@@ -1,0 +1,41 @@
+RTL CODE: 
+`timescale 1ns / 1ps
+//Date : 11/09/2024
+//Name : Charan Kopparla 
+
+//Expression : (ABC+A'C'+D)
+
+module boolean_exp(
+input a, b, c, d, 
+output y);
+assign y = (a & b & c) | (~a & ~c) | d;
+endmodule
+
+
+TEST BENCH :
+`timescale 1ns / 1ps
+//Date : 11/09/2024
+//Name : Charan Kopparla 
+
+module boolean_exp_tb();
+reg a,b,c,d;
+wire y;
+boolean_exp dut(a,b,c,d,y);
+initial begin 
+
+a=0;b=0;c=0;d=0;
+#10;
+$display("a=%b,b=%b,c=%b,d=%b,y=%b",a,b,c,d,y);
+a=1;b=0;c=0;d=0;
+#10;
+$display("a=%b,b=%b,c=%b,d=%b,y=%b",a,b,c,d,y);
+a=1;b=1;c=1;d=1;
+#10;
+$display("a=%b,b=%b,c=%b,d=%b,y=%b",a,b,c,d,y);
+a=0;b=1;c=1;d=1;
+#10;
+$display("a=%b,b=%b,c=%b,d=%b,y=%b",a,b,c,d,y);
+
+$finish();
+end
+endmodule
