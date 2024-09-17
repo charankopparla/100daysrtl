@@ -1,0 +1,73 @@
+RTL CODE :
+`timescale 1ns / 1ps
+//Date : 12/09/2024
+//Name : Charan Kopparla
+//min boolean exp : bc'e + a'ce' + ab'cf' + bc'def + b'c'def + a'b'c'df + a'b'd'e'f
+    
+module min_boolean_exp(
+input a,b,c,d,e,f,
+output y);
+wire w1,w2,w3,w4,w5,w6,w7;
+assign w1 = ((b&c)&(~e));
+assign w2 = ((~a&c)&(~e));
+assign w3 = (a&(~b&c)&(~f));
+assign w4 = (b&(~c)&d&e&f);
+assign w5 = (~b&(~c)&d&e&f);
+assign w6 = (~a&~b&~c&d&f);
+assign w7 = (~a&~b&~d&~e&~f);
+assign y = w1|w2|w3|w4|w5|w6|w7;
+endmodule   
+
+TEST BENCH :
+
+`timescale 1ns / 1ps
+// Date : 11/09/2024
+//Name : Charan Kopparla 
+
+module min_boolean_exp_tb();
+reg a,b,c,d,e,f;
+wire y;
+min_boolean_exp dut(.a(a),.b(b),.c(c),.d(d),.e(e),.f(f),.y(y));
+initial begin 
+a=0;b=0;c=0;d=0;e=0;f=0;
+#10;
+$display("a=%b,b=%b,c=%b,d=%b,e=%b,f=%b,y=%b",a,b,c,d,e,f,y);
+a=0;b=0;c=0;d=0;e=0;f=1;
+#10;
+$display("a=%b,b=%b,c=%b,d=%b,e=%b,f=%b,y=%b",a,b,c,d,e,f,y);
+a=0;b=0;c=0;d=0;e=1;f=0;
+#10;
+$display("a=%b,b=%b,c=%b,d=%b,e=%b,f=%b,y=%b",a,b,c,d,e,f,y);
+a=0;b=0;c=0;d=1;e=0;f=0;
+#10;
+$display("a=%b,b=%b,c=%b,d=%b,e=%b,f=%b,y=%b",a,b,c,d,e,f,y);
+a=0;b=0;c=1;d=0;e=0;f=0;
+#10;
+$display("a=%b,b=%b,c=%b,d=%b,e=%b,f=%b,y=%b",a,b,c,d,e,f,y);
+a=0;b=1;c=0;d=0;e=0;f=0;
+#10;
+$display("a=%b,b=%b,c=%b,d=%b,e=%b,f=%b,y=%b",a,b,c,d,e,f,y);
+a=1;b=0;c=0;d=0;e=0;f=0;
+#10;
+$display("a=%b,b=%b,c=%b,d=%b,e=%b,f=%b,y=%b",a,b,c,d,e,f,y);
+a=1;b=1;c=0;d=0;e=0;f=0;
+#10;
+$display("a=%b,b=%b,c=%b,d=%b,e=%b,f=%b,y=%b",a,b,c,d,e,f,y);
+a=1;b=1;c=1;d=0;e=0;f=0;
+#10;
+$display("a=%b,b=%b,c=%b,d=%b,e=%b,f=%b,y=%b",a,b,c,d,e,f,y);
+a=1;b=1;c=1;d=1;e=0;f=0;
+#10;
+$display("a=%b,b=%b,c=%b,d=%b,e=%b,f=%b,y=%b",a,b,c,d,e,f,y);
+a=1;b=1;c=0;d=1;e=1;f=0;
+#10;
+$display("a=%b,b=%b,c=%b,d=%b,e=%b,f=%b,y=%b",a,b,c,d,e,f,y);
+a=0;b=0;c=1;d=0;e=1;f=0;
+#10;
+$display("a=%b,b=%b,c=%b,d=%b,e=%b,f=%b,y=%b",a,b,c,d,e,f,y);
+a=0;b=0;c=1;d=0;e=1;f=1;
+#10;
+$display("a=%b,b=%b,c=%b,d=%b,e=%b,f=%b,y=%b",a,b,c,d,e,f,y);
+$finish();
+end
+endmodule
