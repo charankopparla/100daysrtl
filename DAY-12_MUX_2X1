@@ -1,0 +1,42 @@
+RTL CODE :
+`timescale 1ns / 1ps
+//Date : 20/09/2024
+//Name : Charan Kopparla 
+
+
+module mux_2x1(
+input a,b,
+input sel,
+output y_out);
+
+begin
+ 
+assign y_out = sel?a:b;
+end
+endmodule
+
+TEST BENCH :
+`timescale 1ns / 1ps
+//Date : 20/09/2024
+//Name : Charan Kopparla 
+
+module mux_2x1_tb();
+reg a,b;
+reg sel;
+wire y_out;
+mux_2x1 dut(.a(a),.b(b),.sel(sel),.y_out(y_out));
+initial begin 
+a = 0; b=0; sel =0;
+#10;
+$display("a = %b,b=%b,sel=%b,y_out=%b",a,b,sel,y_out);
+a = 0; b=1; sel =0;
+#10;
+$display("a = %b,b=%b,sel=%b,y_out=%b",a,b,sel,y_out);
+a = 1; b=0; sel =1;
+#10;
+$display("a = %b,b=%b,sel=%b,y_out=%b",a,b,sel,y_out);
+a = 1; b=1; sel =1;
+#10;
+$display("a = %b,b=%b,sel=%b,y_out=%b",a,b,sel,y_out);
+end 
+endmodule
