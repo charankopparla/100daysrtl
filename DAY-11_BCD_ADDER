@@ -1,0 +1,60 @@
+RTL CODE :
+  `timescale 1ns / 1ps
+//Date : 19/09/2024
+//Name : Charan Kopparla 
+
+
+module BCD_adder(
+        input [3:0] a,b,
+        input cin,
+        output reg [7:0] sum,
+        output reg cout);
+        reg[7:0] temp_sum;
+
+        always@(*)
+        begin 
+            temp_sum = a+b+cin;
+              if(temp_sum>9)
+              begin
+              temp_sum = temp_sum+4'b0110;
+              cout=1;
+              sum = temp_sum[7:0];
+              end 
+              else begin 
+              cout=0;
+              sum=temp_sum [7:0];
+              end
+        end
+            
+endmodule
+
+
+TEST BENCH :
+
+`timescale 1ns / 1ps
+//Date : 19/09/2024
+//Name : Charan Kopparla
+
+
+module BCD_adder_tb();
+reg [3:0] a,b;
+reg cin;
+wire [7:0] sum;
+wire cout;
+BCD_adder dut(.a(a),.b(b),.cin(cin),.sum(sum),.cout(cout));
+initial begin
+$monitor("a=%d,b=%d,cin=%d,sum=%b,cout=%d",a,b,cin,sum,cout);
+
+a=6;b=12; cin=0;
+#10;
+a=6;b=1; cin=1;
+#10;
+a=6;b=7; cin=1;
+#10;
+a=7;b=4; cin=1;
+#10;
+a=8;b=5; cin=0;
+#10;
+$finish();
+end 
+endmodule
