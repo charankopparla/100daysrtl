@@ -1,0 +1,46 @@
+RTL CODE :
+`timescale 1ns / 1ps
+//Date : 21/09/2024
+//Name : Charan Kopparla 
+
+
+module mux_4x1(
+input [3:0]A,
+input [1:0]sel,
+output reg y);
+always @(*)
+begin 
+case(sel)
+   2'b00: y = A[0];
+   2'b10: y = A[1];
+   2'b01: y = A[2];
+   2'b11: y = A[3];
+      
+ endcase
+end 
+endmodule
+
+
+TEST BENCH :
+
+`timescale 1ns / 1ps
+// Date : 21/09/2024
+// Name : Charan Kopparla
+
+
+module mux_4x1_tb( );
+reg [3:0]A;
+reg [1:0] sel;
+wire y;
+mux_4x1 dut(.A(A),.sel(sel),.y(y));
+initial begin 
+for(integer i=0;i<15;i=i+1)
+begin
+A = $random();
+sel = $random();
+#10;
+$display("A =%b,sel=%d,y=%d",A,sel,y);
+end 
+end
+
+endmodule
