@@ -1,0 +1,74 @@
+RTL CODE:
+`timescale 1ns / 1ps
+// Date : 23/09/2024
+// Name : Charan Kopparla
+
+module mux_2x1(
+   input a,b,
+   input  sel,
+   output out);
+   assign out = (sel)? b:a;
+ endmodule 
+   
+
+module mux_16x1(
+    input [15:0] in,
+    input [3:0] sel,
+    output out);
+    
+    wire [7:0] w1;
+    wire [3:0] w2;
+    wire [1:0] w3;
+// First level: 8 instances of 2x1 Mux   
+mux_2x1 M1(.a(in[0]),.b(in[1]),.sel(sel[0]),.out(w1[0]));
+mux_2x1 M2(.a(in[2]),.b(in[3]),.sel(sel[0]),.out(w1[1]));
+mux_2x1 M3(.a(in[4]),.b(in[5]),.sel(sel[0]),.out(w1[2]));
+mux_2x1 M4(.a(in[6]),.b(in[7]),.sel(sel[0]),.out(w1[3]));
+mux_2x1 M5(.a(in[8]),.b(in[9]),.sel(sel[0]),.out(w1[4]));
+mux_2x1 M6(.a(in[10]),.b(in[11]),.sel(sel[0]),.out(w1[5]));
+mux_2x1 M7(.a(in[12]),.b(in[13]),.sel(sel[0]),.out(w1[6]));
+mux_2x1 M8(.a(in[14]),.b(in[15]),.sel(sel[0]),.out(w1[7]));
+
+// Second level: 4 instances of 2x1 Mux
+mux_2x1 M9(.a(w1[0]),.b(w1[1]),.sel(sel[1]),.out(w2[0]));
+mux_2x1 M10(.a(w1[2]),.b(w1[3]),.sel(sel[1]),.out(w2[1]));
+mux_2x1 M11(.a(w1[4]),.b(w1[5]),.sel(sel[1]),.out(w2[2]));
+mux_2x1 M12(.a(w1[6]),.b(w1[7]),.sel(sel[1]),.out(w2[3]));
+
+// Third level : 2 instances of 2x1 Mux
+mux_2x1 M13(.a(w2[0]),.b(w2[1]),.sel(sel[2]),.out(w3[0]));
+mux_2x1 M14(.a(w2[2]),.b(w2[3]),.sel(sel[2]),.out(w3[1]));
+
+// Fourth level: 1 instance of 2x1 Mux
+mux_2x1 M15(.a(w3[0]),.b(w3[1]),.sel(sel[3]),.out(out));
+
+endmodule
+
+TEST BENCH :
+`timescale 1ns / 1ps
+// Date : 23/09/2024
+//Name : Charan Kopparla 
+
+module mux_16x1_tb();
+    reg [15:0]in;
+    reg [3:0] sel;
+    wire out;
+    
+mux_16x1 dut(in,sel,out);
+integer i;
+initial begin
+    
+    for(i=0;i<15;i=i+1)
+    begin 
+        in = $random();
+        sel = $random();
+        #10;
+     $display("in=%b;sel=%d,out=%d",in,sel,out);
+     #10;
+     end
+     end 
+     initial begin 
+     #300;
+     $finish();
+     end 
+endmodule
