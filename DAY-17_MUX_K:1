@@ -1,0 +1,23 @@
+RTL CODE :
+`timescale 1ns / 1ps
+// Date : 25/09/2024
+//Name : Charan Kopparla 
+module mux_64X1#(parameter K = 64)(
+
+     input [K-1:0] A,
+     input [5:0] sel,
+     output reg y);
+     always@(*)
+      begin 
+      for(integer i =0;i<K;i=i+1)
+      begin 
+      case(sel)
+      i:y= A[i];
+      endcase
+      end 
+     
+      end 
+endmodule 
+     
+
+TEST BENCH:
