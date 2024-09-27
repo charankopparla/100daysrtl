@@ -1,0 +1,61 @@
+RTL CODE :
+`timescale 1ns / 1ps
+//Date : 28/09/2024
+//Name : Charan Kopparla 
+
+module Nbit_comp #(parameter N = 8)(
+    input[N-1:0] A,B,
+    output reg A_greater,A_equal,A_less);
+    
+    always@(*)
+    begin 
+     if(A>B)
+      begin 
+      A_greater = 1;
+      A_equal = 0;
+      A_less = 0;
+      end
+     if(A<B)
+     begin 
+     A_greater = 0;
+      A_equal = 0;
+      A_less = 1;
+      end 
+     else
+     begin 
+     A_greater = 0;
+      A_equal = 1;
+      A_less = 0;
+      end 
+      end   
+endmodule
+
+
+TEST BENCH :
+`timescale 1ns / 1ps
+//Date:28/09/2024
+//Name : Charan Kopparla
+
+module Nbit_comp_tb #(parameter N=8)();
+    reg [N-1:0]A,B;
+    wire A_greater,A_equal,A_less;
+    
+Nbit_comp  dut (A,B,A_greater,A_equal,A_less);
+    integer i;
+   initial begin
+   for(i = 0;i<8;i=i+1)
+   begin
+     A = $random();
+     B= $random();
+     #10;
+     $display("A = %d, B=%d,A_greater = %d ,A_equal = %d,A_less=%d",A,B,A_greater,A_equal,A_less);
+     #10;
+     end 
+     end
+    
+     initial begin 
+     #200;
+     $finish();
+     end
+
+endmodule
