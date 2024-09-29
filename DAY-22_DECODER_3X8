@@ -1,0 +1,71 @@
+RTL CODE:
+`timescale 1ns / 1ps
+//Date : 30/09/2024
+//Name : Charan Kopparla 
+
+module Decoder_2x4(
+    input [1:0]in,
+    input en,
+    output reg [3:0] out);
+    
+    always@(*)
+     begin 
+       if(en)
+        begin 
+            case(in)
+           2'b00 : out = 4'b0001;
+           2'b01 : out = 4'b0010;
+           2'b10 : out = 4'b0101;
+           2'b11 : out = 4'b1000;
+           default : out = 4'b0000;
+           endcase
+           end
+           end
+
+endmodule
+
+
+module Decoder_3x8(
+    input [2:0] in,  
+    input en,  
+    output [7:0] out );
+    wire [3:0] w1,w2;
+    
+Decoder_2x4 M1 (.in(in[1:0]), .en(~in[2]), .out(w1));
+Decoder_2x4 M2 (.in(in[1:0]), .en(in[2]), .out(w2));
+
+assign out = {w1,w2};
+
+endmodule
+
+TEST BENCH:
+`timescale 1ns / 1ps
+ //Date : 30/09/2024
+//Name : Charan Kopparla 
+   
+module Decoder_3x8_tb();
+    reg [2:0] in;
+    reg en;
+    wire [7:0] out;
+    
+Decoder_3x8 dut(.in(in),.en(en),.out(out));
+    integer i ;
+     initial begin
+     for(i=0;i<10;i=i+1)
+      begin 
+       in = $random();
+       en = 1;
+       #10;
+       $display("in=%d,en=%d,out=%d",in,en,out);
+       #10;
+       end
+       end
+       initial begin
+       #200;
+       $finish();
+       end
+       
+endmodule 
+       
+ 
+ 
