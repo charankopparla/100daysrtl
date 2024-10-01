@@ -1,0 +1,50 @@
+RTL CODE :
+`timescale 1ns / 1ps
+//Date : 02/10/2024
+//Name : Charan Kopparla 
+
+module Tri_buff(
+    input A,
+    input en,
+    output reg  y);
+    always@(*)
+     begin 
+      if(en)
+        begin 
+         y = A;
+         end 
+         
+      else begin 
+         y = 1'bz;
+       end 
+       end 
+endmodule 
+
+
+TEST BENCH:
+`timescale 1ns / 1ps
+//Date : 02/10/2024
+//Name : Charan Kopparla
+
+module Tri_buff_tb();
+    reg A,en;
+    wire y;
+    integer i;
+
+Tri_buff dut(A,en,y);
+
+initial begin 
+    for(i=0;i<8; i=i+1)
+     begin 
+      A = $random();
+      en = $random();
+      #10;
+      $display("A=%d,en = %d,y = %d",A,en,y);
+      #10;
+      end
+      end 
+      initial begin 
+      #200;
+      $finish();
+      end 
+endmodule
