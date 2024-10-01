@@ -1,0 +1,46 @@
+RTL CODE:
+`timescale 1ns / 1ps
+//Date : 3/10/2024
+//Name : Charan Kopparla 
+
+module bin_2_grey(
+    input [4:0] A,
+    output [4:0] B);
+ assign B[4] = A[4];
+ assign B[3] = A[4]^A[3];
+ assign B[2] = A[3]^A[2];
+ assign B[1] = A[2]^A[1];
+ assign B[0] = A[1]^A[0];
+
+endmodule
+
+TEST BENCH :
+`timescale 1ns / 1ps
+//Date : 3/10/2024
+//Name : Charan Kopparla 
+
+module bin_2_grey_tb();
+    reg [4:0] A;
+    wire [4:0] B;
+bin_2_grey dut(A,B);
+   integer i;
+   initial begin 
+   for(i=0;i<10;i=i+1)
+    begin 
+     A=$random();
+     #10;
+     $display("A=%b,B=%b",A,B);
+     #10;
+     end 
+     end 
+     initial begin
+      #200;
+      $finish();
+      end 
+endmodule
+      
+    
+
+
+
+
