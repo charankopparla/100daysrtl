@@ -1,0 +1,67 @@
+RTL CODE :
+`timescale 1ns / 1ps
+//Date : 7/10/2024
+//Name : Charan Kopparla 
+
+
+module sr_ff(
+    input clk,rst, s,r,
+    output reg  q,q_bar);
+
+always@(posedge clk)
+ begin
+   if(rst)
+    begin
+      q <=0;
+      q_bar<=1;
+      end 
+    else begin
+      case({s,r})
+       2'b00: {q,q_bar} <={q,q_bar};
+       2'b01: {q,q_bar} <={1'b0,1'b1};
+       2'b10: {q,q_bar} <={1'b1,1'b0};
+       2'b11: {q,q_bar} <={1'bx,1'bx};
+       default : begin end
+       endcase
+       end
+       end
+
+endmodule
+
+
+TEST BENCH :
+`timescale 1ns / 1ps                                                        
+//Date : 7/10/2024                                                          
+//Name : Charan Kopparla                                                    
+                                                                            
+module sr_ff_tb();                                                          
+     reg clk,rst,s,r;                                                       
+     wire q,q_bar;                                                          
+                                                                            
+sr_ff dut(clk,rst,s,r,q,q_bar);                                             
+                                                                            
+always #5 clk=~clk;                                                         
+initial clk = 0;                                                            
+    initial begin                                                           
+     rst = 1;                                                               
+     #10;                                                                   
+     rst = 0;                                                               
+     {s,r} = 2'b00 ;                                                        
+     #10;                                                                   
+     $display("s=%b,r=%b,q=%b,q_bar=%b",s,r,q,q_bar);                       
+      {s,r} = 2'b01 ;                                                       
+     #10;                                                                   
+     $display("s=%b,r=%b,q=%b,q_bar=%b",s,r,q,q_bar);                       
+      {s,r} = 2'b10 ;                                                       
+     #10;                                                                   
+     $display("s=%b,r=%b,q=%b,q_bar=%b",s,r,q,q_bar);                       
+      {s,r} = 2'b11 ;                                                       
+     #10;                                                                   
+     $display("s=%b,r=%b,q=%b,q_bar=%b",s,r,q,q_bar);                       
+     end                                                                    
+     initial begin                                                          
+     #200;                                                                  
+     $finish();                                                             
+     end                                                                    
+                                                                            
+endmodule                                                                   
