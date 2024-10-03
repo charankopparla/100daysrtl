@@ -1,0 +1,44 @@
+RTL CODE :
+`timescale 1ns / 1ps
+//Date : 5/10/2024
+//Name : Charan Kopparla 
+
+module Full_sub(
+    input A,B,C,
+    output diff,borrow);
+
+assign  borrow = A^B^C;
+assign diff = (~A)&B|(B&C)|C&(~A);
+
+endmodule
+
+
+TEST BENCH:
+
+`timescale 1ns / 1ps
+//Date : 5/10/2024
+//Name : Charan Kopparla 
+
+module Full_sub_tb();
+    reg A,B,C;
+    wire diff,borrow;
+    
+Full_sub dut(A,B,C,diff,borrow);
+    integer i ;
+    initial begin 
+    for(i = 0 ; i<8 ; i=i+1)
+    begin 
+    A = $random();
+    B = $random();    
+    C = $random();
+    #10;
+    $display("A=%b,B= %b,C= %b,borrow = %b,diff=%b",A,B,C,diff,borrow);
+    #10;
+    end
+    end
+    initial begin 
+    #200;
+    $finish();
+    end 
+    endmodule 
+
