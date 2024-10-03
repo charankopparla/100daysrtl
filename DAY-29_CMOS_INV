@@ -1,0 +1,43 @@
+RTL CODE:
+`timescale 1ns / 1ps
+//Date : 6/10/2024
+//Name : Charan Kopparla
+
+
+module cmos_inv(
+    input [1:0] A,
+    output y );
+   
+  supply1 pow;
+  supply0 gnd ;
+  
+  pmos (y,pow,A);
+  
+  nmos(y,gnd,A);
+  
+endmodule
+
+TEST BENCH:
+`timescale 1ns / 1ps
+//Date : 6/10/2024
+//Name : Charan Kopparla
+
+module cmos_inv_tb();
+    reg A;
+    wire y;
+cmos_inv dut(A,y);
+   initial begin
+    A = 1'b1;
+    #10;
+    $display("A = %b,y=%b",A,y);
+    #10;
+     A = 1'b0;
+    $display("A = %b,y=%b",A,y);
+    #20;
+    end 
+    initial begin
+    #200;
+    $finish();
+    end 
+
+endmodule
