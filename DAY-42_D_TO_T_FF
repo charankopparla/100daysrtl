@@ -1,0 +1,70 @@
+RTL CODE :
+`timescale 1ns / 1ps
+//Date : 19/10/2024
+//Name : Charan Kopparla 
+
+module D_to_T_ff (
+    input T,      
+    input clk,    
+    input reset,  
+    output reg Q  
+);
+
+    always @(posedge clk or posedge reset) begin
+        if (reset)
+            Q <= 1'b0;  
+        else if (T)
+            Q <= ~Q;    
+        else
+            Q <= Q;     
+    end
+
+endmodule
+
+TEST BENCH :
+
+
+`timescale 1ns / 1ps
+//Date : 19/10/2024
+//Name : Charan Kopparla 
+
+module D_to_T_ff_tb;
+    reg T;
+    reg clk;
+    reg reset;
+    wire Q;
+
+    D_to_T_ff dut (
+        .T(T),
+        .clk(clk),
+        .reset(reset),
+        .Q(Q)
+    );
+
+
+    always #5 clk = ~clk; 
+    
+    initial begin
+      
+        clk = 0;
+        reset = 1;
+        T = 0;
+        #10 
+        reset = 0;
+        #10
+        T = 0;
+        #10 
+        T = 1;
+        #10 
+        T = 0;
+        #10 
+        T = 1;
+        #10 
+        reset = 1;
+        #10 
+        reset = 0;
+        end 
+        initial begin
+        #50 $finish();
+    end
+endmodule
