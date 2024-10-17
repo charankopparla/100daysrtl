@@ -1,0 +1,63 @@
+RTL CODE :
+
+`timescale 1ns / 1ps
+// Date: 10/10/2024
+// Name: Charan Kopparla
+
+module T_ff(
+    input clk,
+    input rst,
+    input T,
+    output reg q,
+    output q_bar
+);
+    always @(posedge clk or posedge rst) 
+    begin
+        if (rst)
+            q <= 0;
+        else
+            case (T)
+                1'b0: q <= q;
+                1'b1: q <= ~q;
+            endcase
+    end
+
+    assign q_bar = ~q;
+endmodule
+
+
+TEST BENCH : 
+
+`timescale 1ns / 1ps
+// Date: 10/10/2024
+// Name: Charan Kopparla
+
+module T_ff_tb();
+    reg clk, rst, T;
+    wire q, q_bar;
+     
+    T_ff dut (.clk(clk), .rst(rst), .T(T), .q(q), .q_bar(q_bar));
+
+    always #5 clk = ~clk;
+
+    initial begin
+        clk = 0;
+        rst = 1;   
+        #10;
+        rst = 0;   
+        T = 1'b0;
+        #10;
+        $display("T=%b, q=%b, q_bar=%b", T, q, q_bar);
+        T = 1'b1;
+        #10;
+        $display("T=%b, q=%b, q_bar=%b", T, q, q_bar);
+        #10;
+        T = 1'b0;
+        #10;
+        $display("T=%b, q=%b, q_bar=%b", T, q, q_bar);
+        T = 1'b1;
+        #10;
+        $display("T=%b, q=%b, q_bar=%b", T, q, q_bar);
+        $finish;
+    end
+endmodule
