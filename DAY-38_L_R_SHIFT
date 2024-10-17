@@ -1,0 +1,59 @@
+RTL CODE :
+`timescale 1ns / 1ps
+//Date : 15/10/2024
+//Name :Charan Kopparla 
+
+
+module L_R_shift(
+    input clk,rst,lr_bar,
+    input [3:0] i,
+    output reg [3:0] y);
+
+always@(posedge clk )
+  begin  
+    if(rst)
+      y <=4'b0000;
+    else 
+    begin  
+       if(lr_bar)
+         y <= (i<<1);
+       else 
+         y <= (i>>1);
+    end 
+   end 
+   
+endmodule 
+
+
+TEST BENCH :
+
+`timescale 1ns / 1ps
+//Date : 15/10/2024
+//Name : Charan Kopparla 
+
+module L_R_shift_tb();
+    reg clk,rst,lr_bar;
+    reg [3:0]i;
+    wire [3:0] y;
+    
+L_R_shift dut(clk,rst,lr_bar,i,y);
+ always #5 clk = ~clk;
+   initial clk = 5;
+   initial begin
+   rst = 1;
+   #10;
+   rst = 0;
+   lr_bar = 0;
+   i=4'b0100;
+   #10;
+   $display("clk=%d,rst=%d,lr_bar=%d,i=%d,y=%d",clk,rst,lr_bar,i,y);
+   lr_bar = 1;
+   i = 4'b0100;
+   #10;
+   $display("clk=%d,rst=%d,lr_bar=%d,i=%d,y=%d",clk,rst,lr_bar,i,y);
+   end 
+   initial begin
+    #200;
+    $finish();
+    end 
+endmodule
