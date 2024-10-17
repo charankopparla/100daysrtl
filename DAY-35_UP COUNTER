@@ -1,0 +1,51 @@
+RTL CODE :
+
+`timescale 1ns / 1ps
+//Date : 12/09/2024
+//Name : Charan Kopparla
+module up_counter(  
+        input clk,rst,
+        output reg [5:0]count);
+
+always @ (posedge clk)
+begin
+  if(rst)
+     count <=6'b0;
+  else 
+    count <= count+1;
+   
+    end
+endmodule
+
+
+TEST BENCH :
+
+`timescale 1ns / 1ps
+//Date : 12/09/2024
+//Name : Charan Kopparla
+
+module up_counter_tb();
+    reg clk, rst;
+    wire [5:0] count;
+    integer i;
+    
+    up_counter dut(clk, rst, count); 
+    
+    initial clk = 0;
+    always #5 clk = ~clk; // Shorter period to simulate faster clock
+    
+    initial begin 
+        rst = 1; 
+        #10 rst = 0; // Release reset after 10 time units
+    end
+    
+    initial begin
+        for (i = 0; i < 63; i = i + 1) begin
+            #10; // Observe the count every 10 time units
+            $display("Time=%0t clk=%d, rst=%d, count=%d", $time, clk, rst, count);
+        end
+        #10;
+        $finish;
+    end
+    
+endmodule
