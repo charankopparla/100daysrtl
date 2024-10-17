@@ -1,0 +1,100 @@
+RTL CODE :
+`timescale 1ns / 1ps
+//Date : 17/10/2024
+//Name : Charan Kopparla 
+
+module D_to_SR_flipflop (
+    input D,       
+    input clk,   
+    input reset,  
+    output reg Q,  
+    output reg Qn  
+);
+wire S;
+wire R;
+
+
+assign S = D;       
+assign R = ~D;     
+
+always @(posedge clk or posedge reset) begin
+    if (reset) begin
+        Q <= 1'b0;  
+        Qn <= 1'b1; 
+    end
+    else begin
+        case ({S, R})
+            2'b01: begin
+                Q <= 1'b0;  
+                Qn <= 1'b1;
+            end
+            2'b10: begin
+                Q <= 1'b1;  
+                Qn <= 1'b0;
+            end
+            2'b00: begin
+                Q <= Q;     
+                Qn <= Qn;
+            end
+            2'b11: begin
+                Q <= 1'bx;  
+                Qn <= 1'bx;
+            end
+        endcase
+    end
+end
+
+endmodule
+
+TEST BENCH :
+
+`timescale 1ns / 1ps
+//Date : 17/10/2024
+//Name : Charan Kopparla
+
+module tb_D_to_SR_flipflop;
+    reg D;
+    reg clk;
+    reg reset;
+    wire Q;
+    wire Qn;
+
+    D_to_SR_flipflop dut (
+        .D(D),
+        .clk(clk),
+        .reset(reset),
+        .Q(Q),
+        .Qn(Qn)
+    );
+    always begin
+        #5 clk = ~clk; 
+    end
+
+    
+    initial begin
+        clk = 0;
+        reset = 1;
+        D = 0;
+        #10 
+        reset = 0;
+        
+        #10 
+        D = 1;  
+        #10 
+        D = 0;   
+        #10 
+        D = 1;  
+        #10
+        D = 0;
+        end 
+        initial begin 
+        #200;
+         $finish();
+    end
+    initial begin
+        $monitor("| D = %b | Reset = %b | Q = %b | Qn = %b", D, reset, Q, Qn);
+    end
+
+endmodule
+
+
