@@ -1,0 +1,64 @@
+RTL CODE :
+`timescale 1ns / 1ps
+//Date : 14/10/2024
+//Name : Charan Kopparla
+
+module up_down_counter(
+    input clk,rst,
+    input up_down,
+    output reg [3:0] count);
+
+always@(posedge clk or posedge rst)
+  begin 
+  if(rst)
+   begin 
+     count <= 4'b0000;
+   end 
+  else if(up_down) begin 
+    count <= count + 1;
+    end 
+    
+  else begin 
+    count <= count-1;
+    end 
+    end
+
+endmodule
+
+
+TEST BENCH :
+
+`timescale 1ns / 1ps
+//Date : 14/10/2024
+//Name : Charan Kopparla 
+
+module up_down_counter_tb();
+    reg clk,rst;
+    reg up_down;
+    wire [3:0] count;
+    integer i ;
+
+up_down_counter dut(clk,rst,up_down,count);
+     
+      initial begin 
+     clk = 0;
+     forever #5 clk = ~clk;
+     end
+   initial begin 
+     rst = 1;
+     #10;
+     $display("clk=%d,rst=%d,up_down=%d,count=%d",clk,rst,up_down,count);
+     for(i=0;i<16;i=i+1)
+     begin 
+       rst = 0;
+       #10;
+       up_down=1;
+       #10;
+     $display("clk=%d,rst=%d,up_down=%d,count=%d",clk,rst,up_down,count);
+      end 
+      end 
+      initial begin 
+      #200;
+      $finish();
+      end
+endmodule
