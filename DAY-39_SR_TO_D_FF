@@ -1,0 +1,88 @@
+RTL CODE :
+
+`timescale 1ns / 1ps
+//Date : 16/10/2024
+//Name : Charan Kopparla 
+
+module Srff_Dff(
+    input D, clk, rst,
+    output q, q_bar
+);
+    
+    sr_ff srff_inst (
+        .s(D), 
+        .r(~D), 
+        .clk(clk), 
+        .rst(rst), 
+        .q(q), 
+        .q_bar(q_bar)
+    );
+endmodule
+
+
+module sr_ff(
+    input clk, rst, s, r,
+    output reg q, q_bar
+);
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            q <= 0;
+            q_bar <= 1;
+        end else begin
+            case ({s, r})
+                2'b00: {q, q_bar} <= {q, q_bar}; 
+                2'b01: {q, q_bar} <= {1'b0, 1'b1}; 
+                2'b10: {q, q_bar} <= {1'b1, 1'b0}; 
+                2'b11: {q, q_bar} <= {1'bx, 1'bx}; 
+            endcase
+        end
+    end
+endmodule
+
+
+TEST BENCH :
+
+`timescale 1ns / 1ps
+//Date : 16/10/2024
+//Name : Charan Kopparla
+
+module Srff_Dff_tb();
+    reg D, clk, rst;
+    wire q, q_bar;
+
+    
+    Srff_Dff uut (
+        .D(D), 
+        .clk(clk), 
+        .rst(rst), 
+        .q(q), 
+        .q_bar(q_bar)
+    );
+
+    
+    always #5 clk = ~clk;
+
+    
+    always #50 D = ~D;
+
+    
+    initial begin
+        
+        clk = 0;
+        D = 0;
+        rst = 1;    
+        
+        #10;
+        rst = 0;    
+        
+        #100;
+        rst = 1;    
+        
+        #10;
+        rst = 0;   
+        
+        #200;       
+        
+        $finish; 
+    end
+endmodule
