@@ -1,0 +1,69 @@
+RTL CODE :
+
+`timescale 1ns / 1ps
+//Date : 8/10/2024
+//Name : Charan Kopparla 
+
+
+module jk_ff(
+    input clk,rst, j,k,
+    output reg  q,q_bar);
+
+always@(posedge clk)
+ begin
+   if(rst)
+    begin
+      q <=0;
+      q_bar<=1;
+      end 
+    else begin
+      case({j,k})
+       2'b00: {q,q_bar} <={q,q_bar};
+       2'b01: {q,q_bar} <={1'b0,1'b1};
+       2'b10: {q,q_bar} <={2'b10};
+       2'b11: {q,q_bar} <={q_bar,q};
+       default : begin end
+       endcase
+       end
+       end
+
+endmodule
+
+
+TEST BENCH :
+
+`timescale 1ns / 1ps
+//Date : 8/10/2024
+//Name : Charan Kopparla 
+
+module jk_ff_tb();
+     reg clk,rst,j,k;
+     wire q,q_bar;
+     
+jk_ff dut(clk,rst,j,k,q,q_bar);
+
+always #5 clk=~clk;
+initial clk = 0;
+    initial begin
+     rst = 1;
+     #10;
+     rst = 0;
+     {j,k} = 2'b00 ;
+     #10;
+     $display("j=%b,k=%b,q=%b,q_bar=%b",j,k,q,q_bar);
+    {j,k} = 2'b01 ;
+     #10;
+    $display("j=%b,k=%b,q=%b,q_bar=%b",j,k,q,q_bar);
+      {j,k} = 2'b10 ;
+     #10;
+    $display("j=%b,k=%b,q=%b,q_bar=%b",j,k,q,q_bar);
+      {j,k} = 2'b11 ;
+     #10;
+     $display("j=%b,k=%b,q=%b,q_bar=%b",j,k,q,q_bar);
+     end 
+     initial begin 
+     #200;
+     $finish();
+     end
+    
+endmodule
