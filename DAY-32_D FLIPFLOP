@@ -1,0 +1,59 @@
+RTL CODE :
+`timescale 1ns / 1ps
+//Date : 9/10/2024
+//Name : Charan Kopparla 
+
+
+module D_ff(
+    input clk,rst, d,
+    output reg  q,q_bar);
+
+always@(posedge clk)
+ begin
+   if(rst)
+    begin
+      q <=0;
+      q_bar<=1;
+      end 
+    else begin
+      case(d)
+       1'b0: {q,q_bar} <={1'b0,1'b1};
+       1'b1: {q,q_bar} <={1'b1,1'b0};
+       
+       default : begin end
+       endcase
+       end
+       end
+
+endmodule
+
+TEST BENCH :
+`timescale 1ns / 1ps
+//Date : 9/10/2024
+//Name : Charan Kopparla 
+
+module D_ff_tb();
+     reg clk,rst,d;
+     wire q,q_bar;
+     
+D_ff dut(clk,rst,d,q,q_bar);
+
+always #5 clk=~clk;
+initial clk = 0;
+    initial begin
+     rst = 1;
+     #10;
+     rst = 0;
+     d= 1'b0 ;
+     #10;
+     $display("d=%b,q=%b,q_bar=%b",d,q,q_bar);
+     d = 1'b1 ;
+     #10;
+     $display("d=%b,q=%b,q_bar=%b",d,q,q_bar);
+     end 
+     initial begin 
+     #200;
+     $finish();
+     end
+    
+endmodule
