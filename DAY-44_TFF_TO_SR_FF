@@ -1,0 +1,94 @@
+RTL CODE :
+`timescale 1ns / 1ps
+//Date : 21/10/2024
+//Name : Charan Kopparla 
+
+module T_to_SR_FF (
+    input T,     
+    input clk,   
+    input reset, 
+    output reg S,
+    output reg R  
+);
+    
+    reg Q; 
+
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            Q <= 0;
+        end else begin
+            if (T)
+                Q <= ~Q;
+            else
+                Q <= Q;
+        end
+    end
+
+    always @(*) begin
+        S = T & ~Q;  // Set condition for SR flip-flop
+        R = T & Q;   // Reset condition for SR flip-flop
+    end
+
+endmodule
+
+
+TEST BENCH :
+`timescale 1ns / 1ps
+//Date : 21/10/2024
+//Name : Charan Kopparla 
+
+module tb_T_to_SR_FF;
+    reg T;
+    reg clk;
+    reg reset;
+    wire S;
+    wire R;
+    
+    T_to_SR_FF uut (
+        .T(T),
+        .clk(clk),
+        .reset(reset),
+        .S(S),
+        .R(R)
+    );
+
+    always #5 clk = ~clk;
+    initial begin 
+        clk = 0;
+        T = 0;
+        reset = 1;
+        #10
+         reset = 0;
+
+        // Test case 1: T = 0 (no toggle)
+        #10 T = 0;
+        #20;
+
+        // Test case 2: T = 1 (toggle state)
+        #10 T = 1;
+        #20;
+
+        // Test case 3: T = 1 (toggle again)
+        #10 T = 1;
+        #20;
+
+        // Test case 4: T = 0 (no toggle)
+        #10 T = 0;
+        #20;
+
+        // Apply reset again
+        #10 reset = 1;
+        #10 reset = 0;
+
+        // Test case 5: T = 1 after reset
+        #10 T = 1;
+        #20;
+
+        // End of simulation
+        $finish;
+    end 
+    initial begin
+        $monitor(" | T = %b | S = %b | R = %b | Reset = %b", T, S, R, reset);
+    end
+
+endmodule
