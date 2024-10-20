@@ -1,0 +1,55 @@
+RTL CODE:
+`timescale 1ns / 1ps
+//Date : 27/10/2024
+//Name : Charan Kopparla 
+
+
+module parity_bit_gen(
+    input data_in,
+    input en ,
+    output reg parity_bit);
+    wire w1,w2;
+
+
+   assign w1 =^(data_in);
+   assign w2 =~(^data_in);
+   
+   always @(*)
+   begin 
+     if(en)
+       parity_bit = ~w1;
+     else 
+       parity_bit = ~w2;
+    end 
+   
+endmodule
+
+TEST BENCH:
+
+`timescale 1ns / 1ps
+//Date : 27/10/2024
+//Name : Charan Kopparla 
+
+
+
+module parity_bit_gen_tb();
+    reg data_in;
+    reg en;
+    wire parity_bit;
+    
+parity_bit_gen dut(data_in,en,parity_bit);
+    initial begin 
+     for( integer i = 0; i<15;i=i+1)
+      begin 
+        data_in = $random();
+        en = $random();
+         #10;
+        $display("data_in =%b,en=%b,parity_bit =%b",data_in,en,parity_bit);
+        end
+        end
+        initial begin 
+        #100;
+        $finish();
+        end
+        
+endmodule
