@@ -1,0 +1,96 @@
+RTL CODE :
+`timescale 1ns / 1ps
+//Date : 23/10/2024
+//Name : Charan Kopparla
+module JK_to_SR_FF (
+    input J,       
+    input K,       
+    input clk,    
+    input reset,   
+    output reg S, 
+    output reg R,  
+    output reg Q, 
+    output reg Q_bar 
+);
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            Q <= 0;
+            Q_bar <= 1;
+        end else begin
+            case ({J, K})
+                2'b10: Q <= 1;        
+                2'b01: Q <= 0;   
+                2'b11: Q <= ~Q;
+            endcase
+            Q_bar <= ~Q;
+        end
+    end
+
+    always @(*) begin
+        {S, R} = {J, K};  // Direct mapping of JK to SR
+    end
+endmodule
+
+TEST BENCH :
+`timescale 1ns / 1ps
+//Date : 23/10/2024
+//Name : Charan Kopparla    
+
+module JK_to_SR_FF_tb();
+
+    reg J;
+    reg K;
+    reg clk;
+    reg reset;
+    wire S;
+    wire R;
+    wire Q;
+    wire Q_bar;
+    
+    JK_to_SR_FF uut (
+        .J(J),
+        .K(K),
+        .clk(clk),
+        .reset(reset),
+        .S(S),
+        .R(R),
+        .Q(Q),
+        .Q_bar(Q_bar)
+    );
+
+    always #5 clk = ~clk;
+
+    initial begin
+        
+        clk = 0;
+        J = 0;
+        K = 0;
+        reset = 1;
+        
+        #10 reset = 0;
+
+       
+        #10 J = 0; K = 0;
+        #20
+        #10 J = 0; K = 1;
+        #20;
+        #10 J = 1; K = 0;
+        #20;
+        #10 J = 1; K = 1;
+        #20;
+        #10 J = 0; K = 0;
+        #20;
+
+        #10 reset = 1;
+        #10 reset = 0;
+
+        #10 J = 1; K = 1;
+        #20;
+        $finish();
+    end
+    
+    initial begin
+        $display("| J = %b | K = %b | S = %b | R = %b | Q = %b | Q_bar = %b | Reset = %b", J, K, S, R, Q, Q_bar, reset);
+    end
+
+endmodule
