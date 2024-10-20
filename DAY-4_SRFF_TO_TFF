@@ -1,0 +1,111 @@
+RTL CODE :
+`timescale 1ns / 1ps
+//Date :22/10/2024
+//Name : Charan Kopparla 
+module SR_to_T_FF (
+    input S,    
+    input R,     
+    input clk,   
+    input reset, 
+    output reg T, 
+    output reg Q, 
+    output reg Q_bar 
+);
+
+    
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            Q <= 0;
+            Q_bar <= 1;
+        end else begin
+            case ({S, R})
+                2'b10: begin 
+                    Q <= 1;
+                    Q_bar <= 0;
+                end
+                2'b01: begin 
+                    Q <= 0;
+                    Q_bar <= 1;
+                end
+                2'b11: begin 
+                    Q <= ~Q;
+                    Q_bar <= ~Q_bar;
+                end
+                default: begin end 
+            endcase
+        end
+    end
+
+    // T is high when S and R are different (toggle condition)
+    always @(*) begin
+        T = (S ^ R); // XOR of S and R generates the toggle signal T
+    end
+
+endmodule
+
+TEST BENCH :
+
+`timescale 1ns / 1ps
+//Date :22/10/2024
+//Name : Charan Kopparla 
+module SR_to_T_FF_tb();
+
+    reg S;
+    reg R;
+    reg clk;
+    reg reset;
+    wire T;
+    wire Q;
+    wire Q_bar;
+
+    
+    SR_to_T_FF uut (
+        .S(S),
+        .R(R),
+        .clk(clk),
+        .reset(reset),
+        .T(T),
+        .Q(Q),
+        .Q_bar(Q_bar)
+    );
+
+    
+    always #5 clk = ~clk;
+
+    
+    initial begin
+        
+        clk = 0;
+        S = 0;
+        R = 0;
+        reset = 1;
+        #10 
+        reset = 0;
+        #10
+        S = 0; R = 0;
+        #10 
+        S = 0; R = 1;
+        #10 
+        S = 1; R = 0;
+        #10
+        S = 1; R = 1;
+        #10 
+        S = 0; R = 0;
+        #10 
+        reset = 1;
+        #10 
+        reset = 0;
+        #10 
+        S = 1; R = 1;
+        #20;
+
+        // End of simulation
+        $finish;
+    end
+
+    // Monitor output
+    initial begin
+        $monitor(" | S = %b | R = %b | T = %b | Q = %b | Q_bar = %b | Reset = %b", S, R, T, Q, Q_bar, reset);
+    end
+
+endmodule
