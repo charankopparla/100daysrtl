@@ -1,0 +1,53 @@
+RTL CODE :
+`timescale 1ns / 1ps
+// Date : 26/10/2024
+//Name : Charan Kopparla 
+
+module SR_NOR_LATCH(
+      input s,r,
+      input en,
+      input q,q_bar);
+      wire w1,w2;
+      
+
+assign  w1 = ~(s&en);
+assign  w2 = ~(r&en);
+assign  q = ~(q_bar|w1);
+assign  q_bar = ~(q|w2);
+
+endmodule
+
+
+TEST BENCH:
+`timescale 1ns / 1ps
+//Date : 25/10/2024
+//Name : Charan Kopparla 
+
+module SR_LATCH_tb();
+    reg s,r;
+    reg en;
+    wire q,q_bar;
+    SR_LATCH dut(s,r,en,q,q_bar);
+    
+    initial begin 
+    en=1;
+    s = 0; r = 0;
+    #10;
+    $display("s=%b,r=%b,en=%b,q=%b,q_bar=%b",s,r,en,q,q_bar);
+    s = 0; r = 1;
+    #10;
+    $display("s=%b,r=%b,en=%b,q=%b,q_bar=%b",s,r,en,q,q_bar);
+     s = 1; r = 0;
+    #10;
+    $display("s=%b,r=%b,en=%b,q=%b,q_bar=%b",s,r,en,q,q_bar);
+     s = 1; r = 1;
+    #10;
+   $display("s=%b,r=%b,en=%b,q=%b,q_bar=%b",s,r,en,q,q_bar);
+   end 
+   initial begin 
+   #100;
+   $finish();
+   end
+   
+endmodule
+
