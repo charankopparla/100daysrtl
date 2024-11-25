@@ -1,0 +1,82 @@
+RTL CODE :
+`timescale 1ns / 1ps
+//Date : 13/11/2024
+//Name : Charan Kopparla
+
+module fixed_point_division #(parameter WIDTH = 8) (
+    input [WIDTH-1:0] dividend,
+    input [WIDTH-1:0] divisor,
+    output reg [WIDTH-1:0] quotient,
+    output reg [WIDTH-1:0] remainder
+);
+    integer i;
+    reg [2*WIDTH-1:0] temp_dividend;
+
+    always @(dividend or divisor) begin
+        quotient = 0;
+        remainder = 0;
+        temp_dividend = {dividend, {WIDTH{1'b0}}}; // Shift dividend to upper bits
+        
+        for (i = WIDTH - 1; i >= 0; i = i - 1) begin
+            remainder = {remainder[WIDTH-2:0], temp_dividend[2*WIDTH-1]};
+            temp_dividend = temp_dividend << 1;
+            
+            if (remainder >= divisor) begin
+                remainder = remainder - divisor;
+                quotient[i] = 1'b1;
+            end else begin
+                quotient[i] = 1'b0;
+            end
+        end
+    end
+endmodule
+
+
+TEST BENCH :
+//Date : 13/11/2024
+//Name : Charan Kopparla
+
+module tb_fixed_point_division;
+    parameter WIDTH = 8;
+    reg [WIDTH-1:0] dividend, divisor;
+    wire [WIDTH-1:0] quotient, remainder;
+
+    fixed_point_division #(WIDTH) uut (
+        .dividend(dividend),
+        .divisor(divisor),
+        .quotient(quotient),
+        .remainder(remainder)
+    );
+
+    initial begin
+        // Test case 1
+        dividend = 8'b00101000;  // 40
+        divisor = 8'b00000101;   // 5
+        #10;
+        $display("Dividend: %d, Divisor: %d, Quotient: %d, Remainder: %d",
+                 dividend, divisor, quotient, remainder);
+
+        // Test case 2
+        dividend = 8'b00111100;  // 60
+        divisor = 8'b00000110;   // 6
+        #10;
+        $display("Dividend: %d, Divisor: %d, Quotient: %d, Remainder: %d",
+                 dividend, divisor, quotient, remainder);
+
+        // Test case 3
+        dividend = 8'b01011010;  // 90
+        divisor = 8'b00001001;   // 9
+        #10;
+        $display("Dividend: %d, Divisor: %d, Quotient: %d, Remainder: %d",
+                 dividend, divisor, quotient, remainder);
+
+        // Test case 4 (Edge case - divisor is greater than dividend)
+        dividend = 8'b00000101;  // 5
+        divisor = 8'b00001000;   // 8
+        #10;
+        $display("Dividend: %d, Divisor: %d, Quotient: %d, Remainder: %d",
+                 dividend, divisor, quotient, remainder);
+
+        $finish;
+    end
+endmodule
