@@ -1,0 +1,60 @@
+RTL CODE :
+`timescale 1ns / 1ps
+//Date : 24/11/2024
+//Name : Charan Kopparla
+
+module Frequency_Divider_5 (
+    input clk,        
+    input reset,      
+    output reg clk_out  
+);
+
+    reg [2:0] count;
+
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            count <= 0;
+            clk_out <= 0;
+        end else begin
+            if (count == 2) begin
+                clk_out <= ~clk_out;  
+                count <= 0;
+            end else
+                count <= count + 1;
+        end
+    end
+endmodule
+
+TEST BENCH :
+
+`timescale 1ns / 1ps
+//Date : 24/11/2024
+//Name : Charan Kopparla
+
+module Frequency_Divider_5_tb;
+    reg clk;
+    reg reset;
+    wire clk_out;
+
+    Frequency_Divider_5 uut (
+        .clk(clk),
+        .reset(reset),
+        .clk_out(clk_out)
+    );
+
+    initial begin
+        clk = 0;
+        forever #5 clk = ~clk;  
+    end
+
+    initial begin
+        reset = 1; #10;
+        reset = 0; #100;
+        $finish;
+    end
+
+    initial begin
+        $monitor("Time=%0d clk=%b reset=%b clk_out=%b", $time, clk, reset, clk_out);
+    end
+endmodule
+
