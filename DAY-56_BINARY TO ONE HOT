@@ -1,0 +1,50 @@
+RTL CODE :
+`timescale 1ns / 1ps
+//Date : 2/11/2024
+//Name : Charan Kopparla
+
+module bin_to_onehot(
+    input [1:0] A,
+    output reg [3:0] Y
+    );
+    
+   always @(*)
+   begin  
+     case(A)
+      2'b00: Y = 4'b0000;
+      2'b01: Y = 4'b0010;
+      2'b10: Y = 4'b0100;
+      2'b11: Y = 4'b1000;
+      default : begin end
+      endcase 
+   end 
+endmodule
+
+TEST BENCH :
+`timescale 1ns / 1ps
+//Date : 2/11/2024
+//Name : Charan Kopparla 
+
+
+module bin_to_onehot_tb();
+    reg [1:0]A;
+    reg clk;
+    wire [3:0] Y;
+    
+bin_to_onehot dut(A,Y);
+    initial clk = 0;
+    always #5 clk=~clk;
+    
+    initial begin 
+       A = 2'b00;
+     end 
+     
+     always@(posedge clk)
+      begin 
+       A = A + 1;
+       if(A==2'b11)
+        begin 
+         $finish();
+         end 
+      end   
+endmodule
