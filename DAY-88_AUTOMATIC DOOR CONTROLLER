@@ -1,0 +1,94 @@
+RTL CODE :
+`timescale 1ns / 1ps
+//Date : 5/12/2024
+//Name : Charan Kopparla 
+
+module automatic_door_controller (
+    input clk,
+    input reset,
+    input sensor,  // High when motion is detected
+    input manual_override, // High to force door open
+    output reg door_state  // 1 for open, 0 for closed
+);
+
+    reg [1:0] state, next_state;
+
+    localparam CLOSED = 2'b00,
+               OPENING = 2'b01,
+               OPEN = 2'b10,
+               CLOSING = 2'b11;
+
+    always @(posedge clk or posedge reset) begin
+        if (reset) 
+            state <= CLOSED;
+        else 
+            state <= next_state;
+    end
+
+    always @(*) begin
+        next_state = state;
+        case (state)
+            CLOSED: 
+                if (sensor || manual_override)
+                    next_state = OPENING;
+            OPENING: 
+                next_state = OPEN;
+            OPEN: 
+                if (!sensor && !manual_override)
+                    next_state = CLOSING;
+            CLOSING: 
+                next_state = CLOSED;
+        endcase
+    end
+
+    always @(posedge clk or posedge reset) begin
+        if (reset) 
+            door_state <= 0;
+        else begin
+            case (next_state)
+                OPENING, OPEN: door_state <= 1;
+                CLOSING, CLOSED: door_state <= 0;
+            endcase
+        end
+    end
+endmodule
+
+
+TEST BENCH :
+`timescale 1ns / 1ps
+//Date : 5/12/2024
+//Name : Charan Kopparla
+
+module tb_automatic_door_controller;
+    reg clk;
+    reg reset;
+    reg sensor;
+    reg manual_override;
+    wire door_state;
+
+    automatic_door_controller uut (
+        .clk(clk),
+        .reset(reset),
+        .sensor(sensor),
+        .manual_override(manual_override),
+        .door_state(door_state)
+    );
+
+    initial begin
+        clk = 0;
+        forever #5 clk = ~clk;
+    end
+
+    initial begin
+        reset = 1; sensor = 0; manual_override = 0; #10;
+        reset = 0; 
+
+        #20 sensor = 1; #20;
+        sensor = 0; #50;
+
+        manual_override = 1; #20;
+        manual_override = 0; #50;
+
+        $finish;
+    end
+endmodule
