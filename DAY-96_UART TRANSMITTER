@@ -1,0 +1,185 @@
+RTL CODE :
+`timescale 1ns / 1ps
+//Date : 13/12/2024
+//Name : Charan Kopparla 
+`timescale 1ns / 1ps
+
+module uart_transmitter (
+    input clk,              // System clock
+    input reset,            // Active high reset signal
+    input [7:0] data_in,   // 8-bit data to transmit
+    input transmit_data,    // Trigger for transmission
+    output reg tx          // Transmitted UART signal
+);
+    // Internal registers
+    reg [3:0] bit_counter;  // To count bits (start bit + 8 data bits + stop bit)
+    reg [9:0] shift_reg;    // Shift register to hold 1 start bit + 8 data bits + 1 stop bit
+    reg transmitting;       // Indicates if transmission is in progress
+    reg [15:0] baud_counter; // Baud rate counter
+
+    // Baud rate generation based on clock
+    parameter BAUD_RATE = 9600; // Baud rate (modify based on actual requirement)
+    parameter CLOCK_FREQ = 100000000; // Clock frequency (100 MHz for example)
+    parameter BAUD_DIV = CLOCK_FREQ / BAUD_RATE;
+
+    // Transmission state machine
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            // Reset all states
+            tx <= 1;  // Idle state (logic high)
+            transmitting <= 0;
+            bit_counter <= 0;
+            shift_reg <= 10'b1111111111; // Start with stop bit (high)
+            baud_counter <= 0;
+        end
+        else begin
+            if (transmitting) begin
+                // Baud rate generator: control the transmission speed
+                if (baud_counter == (BAUD_DIV - 1)) begin
+                    baud_counter <= 0;
+                    // Shift out data
+                    if (bit_counter < 10) begin
+                        tx <= shift_reg[0];        // Transmit the LSB of the shift register
+                        shift_reg <= shift_reg >> 1; // Shift left to get the next bit
+                        bit_counter <= bit_counter + 1; // Increment the bit counter
+                    end
+                    else begin
+                        transmitting <= 0;  // Transmission complete
+                        bit_counter <= 0;   // Reset bit counter
+                        tx <= 1;  // Return to idle state
+                    end
+                end
+                else begin
+                    baud_counter <= baud_counter + 1; // Keep counting until baud rate is reached
+                end
+            end
+            else if (transmit_data) begin
+                // Start a new transmission
+                transmitting <= 1;
+                bit_counter <= 0;
+                shift_reg <= {1'b1, data_in, 1'b0}; // Load data with stop bit (1) and start bit (0)
+            end
+        end
+    end
+endmodule
+
+
+TEST BENCH :
+`timescale 1ns / 1ps
+//Date : 13/12/2024
+//Name : Charan Kopparla 
+
+`timescale 1ns / 1ps
+
+module tb_uart_transmitter;
+    reg clk;
+    reg reset;
+    reg [7:0] data_in;   // 8-bit data to be transmitted
+    reg transmit_data;    // Signal to trigger data transmission
+    wire tx;              // Transmitted UART signal
+
+    // Instantiate UART Transmitter
+    uart_transmitter uut (
+        .clk(clk),
+        .reset(reset),
+        .data_in(data_in),
+        .transmit_data(transmit_data),
+        .tx(tx)
+    );
+
+    // Clock generation
+    always begin
+        #5 clk = ~clk;  // Clock period of 10 ns (100 MHz)
+    end
+
+    // Test cases
+    initial begin
+        // Initialize signals
+        clk = 0;
+        reset = 0;
+        data_in = 8'b00000000;  // Start with zero data
+        transmit_data = 0;
+
+        // Apply reset
+        #10 reset = 1;    // Assert reset
+        #10 reset = 0;    // Deassert reset
+
+        // Test case 1: Transmit 8-bit data 0x55 (01010101)
+        #10 data_in = 8'h55;  // Load data to transmit
+        transmit_data = 1;    // Trigger data transmission
+        #100 transmit_data = 0;  // End transmission trigger
+        #200;  // Wait for transmission to complete
+
+        // Test case 2: Transmit 8-bit data 0xFF (11111111)
+        #10 data_in = 8'hFF;
+        transmit_data = 1;
+        #100 transmit_data = 0;
+        #200;
+
+        // Test case 3: Transmit 8-bit data 0x00 (00000000)
+        #10 data_in = 8'h00;
+        transmit_data = 1;
+        #100 transmit_data = 0;
+        #200;
+
+        // Test case 4: Transmit 8-bit data 0xA5 (10100101)
+        #10 data_in = 8'hA5;
+        transmit_data = 1;
+        #100 transmit_data = 0;
+        #200;
+
+        // Test case 5: No data transmission (data_in = 0, transmit_data = 0)
+        #10 data_in = 8'h00;
+        transmit_data = 0;
+        #200;
+
+        // Test case 6: Continuous transmission of 0x0F (00001111)
+        #10 data_in = 8'h0F;
+        transmit_data = 1;
+        #100 transmit_data = 0;
+        #50 data_in = 8'h0F; // Continuous transmission at regular intervals
+        transmit_data = 1;
+        #100 transmit_data = 0;
+        #200;
+
+        // Test case 7: Edge case, 8-bit data 0x1F (00011111)
+        #10 data_in = 8'h1F;
+        transmit_data = 1;
+        #100 transmit_data = 0;
+        #200;
+
+        // Test case 8: Data with non-aligned start signal (simulating an error scenario)
+        #10 data_in = 8'h3C;
+        transmit_data = 0;  // No transmission
+        #10 transmit_data = 1; // Start signal in the middle of a clock cycle
+        #100 transmit_data = 0;
+        #200;
+
+        // Test case 9: Long delay between consecutive data transmissions (simulating slow communication)
+        #10 data_in = 8'h7E;
+        transmit_data = 1;
+        #100 transmit_data = 0;
+        #1000;  // Wait for a long time between transmissions
+
+        // Test case 10: Check with random 8-bit data values over a sequence
+        #10 data_in = 8'h36; // Data sequence test
+        transmit_data = 1;
+        #100 transmit_data = 0;
+        #200;
+
+        #10 data_in = 8'hD2;
+        transmit_data = 1;
+        #100 transmit_data = 0;
+        #200;
+
+        #10 data_in = 8'h42;
+        transmit_data = 1;
+        #100 transmit_data = 0;
+        #200;
+
+        // End simulation
+        $stop;
+    end
+
+endmodule
+
