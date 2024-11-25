@@ -1,0 +1,54 @@
+RTL CODE :
+`timescale 1ns / 1ps
+//Date: 12/12/2024
+//Name : Charan Kopparla 
+
+module i2c_master (
+    input clk, reset,
+    input [7:0] data_in,
+    output reg scl, sda,
+    output reg done
+);
+    
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            scl <= 1;
+            sda <= 1;
+            done <= 0;
+        end else begin
+            // Implement start condition, stop condition, and data transfer
+            done <= 1;
+        end
+    end
+endmodule
+
+TEST BENCH :
+`timescale 1ns / 1ps
+//Date: 12/12/2024
+//Name : Charan Kopparla 
+
+
+module tb_i2c_master;
+    reg clk, reset;
+    reg [7:0] data_in;
+    wire scl, sda;
+    wire done;
+
+    i2c_master uut (
+        .clk(clk),
+        .reset(reset),
+        .data_in(data_in),
+        .scl(scl),
+        .sda(sda),
+        .done(done)
+    );
+
+    initial begin
+        clk = 0; reset = 1; data_in = 8'hA5;
+        #10 reset = 0;
+        #1000 $finish;
+    end
+
+    always #5 clk = ~clk;
+endmodule
+
