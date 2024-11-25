@@ -1,0 +1,42 @@
+RTL CODE :
+`timescale 1ns / 1ps
+//Date : 29/11/2024
+//Name : Charan Kopparla
+
+module Clock_Buffer (
+    input clk_in,
+    output clk_out
+);
+    assign clk_out = clk_in;
+endmodule
+
+
+TEST BENCH :
+`timescale 1ns / 1ps
+//Date : 29/11/2024
+//Name : Charan Kopparla
+
+module Clock_Buffer_tb;
+
+    reg clk_in;
+    wire clk_out;
+
+    Clock_Buffer uut (
+        .clk_in(clk_in),
+        .clk_out(clk_out)
+    );
+
+    initial begin
+        clk_in = 0;
+        forever #5 clk_in = ~clk_in;
+    end
+
+    initial begin
+        #100;
+        $finish;
+    end
+
+    initial begin
+        $monitor("Time=%0d clk_in=%b clk_out=%b", $time, clk_in, clk_out);
+    end
+endmodule
