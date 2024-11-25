@@ -1,0 +1,71 @@
+RTL CODE :
+`timescale 1ns / 1ps
+//Date : 19/11/2024
+//Name : Charan Kopparla 
+
+module d_latch_using_mux (
+    input d,
+    input enable,
+    output reg q
+);
+
+    always @(*) begin
+        if (enable)
+            q = d;      
+        else
+            q = q;     
+    end
+
+endmodule
+
+TEST BENCH :
+`timescale 1ns / 1ps
+//Date : 19/11/2024
+//Name : Charan Kopparla 
+
+`timescale 1ns / 1ps
+
+module tb_d_latch_using_mux;
+    reg d;
+    reg enable;
+    wire q;
+
+    d_latch_using_mux uut (
+        .d(d),
+        .enable(enable),
+        .q(q)
+    );
+
+    initial begin
+        $monitor("Time: %0t | D: %b | Enable: %b | Q: %b", $time, d, enable, q);
+        
+        // Initialize inputs
+        d = 0;
+        enable = 0;
+        #10;
+
+        // Test enable = 0, d = 1 (output should not change)
+        d = 1;
+        #10;
+
+        // Test enable = 1, d = 1 (output should change to 1)
+        enable = 1;
+        #10;
+
+        // Test enable = 1, d = 0 (output should change to 0)
+        d = 0;
+        #10;
+
+        // Test enable = 0 (output should retain last value)
+        enable = 0;
+        d = 1;
+        #10;
+
+        // Test enable = 1, d = 1 (output should change to 1)
+        enable = 1;
+        d = 1;
+        #10;
+
+        $finish;
+    end
+endmodule
