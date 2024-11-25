@@ -1,0 +1,44 @@
+RTL CODE :
+`timescale 1ns / 1ps
+// Date : 1/11/2024
+//Name : Charan Kopparla 
+
+module odd_parity_generator(
+    input [3:0] A,
+    output  Y);
+    
+    assign Y = ~(A[0]^A[1]^A[2]^A[3]);
+    
+endmodule
+
+TEST BENCH :
+`timescale 1ns / 1ps
+//Date : 1/11/2024
+//Name : Charan Kopparla
+
+module odd_parity_generator_tb();
+    reg [3:0]A;
+    reg clk;
+    wire Y;
+    
+odd_parity_generator  dut(A,Y);
+   
+    initial clk = 0;
+     always #5 clk = ~clk;
+     
+    initial begin 
+     A = 4'b0000;
+     end 
+     
+     always@(posedge clk)
+      begin 
+       if(A == 4'b1111)
+       begin 
+         $finish();
+        end 
+       else begin 
+         A = A+1;
+       end
+      end
+      endmodule
+
