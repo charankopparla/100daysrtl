@@ -1,0 +1,67 @@
+RTL CODE :
+`timescale 1ns / 1ps
+//Date : 27/11/2024
+//Name : Charan Kopparla
+module Single_Port_RAM #(
+    parameter DATA_WIDTH = 8,
+    parameter ADDR_WIDTH = 4
+)(
+    input clk,
+    input we,
+    input [ADDR_WIDTH-1:0] addr,
+    input [DATA_WIDTH-1:0] din,
+    output reg [DATA_WIDTH-1:0] dout
+);
+
+    reg [DATA_WIDTH-1:0] mem [(2**ADDR_WIDTH)-1:0];
+
+    always @(posedge clk) begin
+        if (we)
+            mem[addr] <= din;
+        else
+            dout <= mem[addr];
+    end
+endmodule
+
+
+TEST BENCH :
+`timescale 1ns / 1ps
+//Date : 27/11/2024
+//Name : Charan Kopparla
+
+
+module Single_Port_RAM_tb;
+
+    reg clk;
+    reg we;
+    reg [3:0] addr;
+    reg [7:0] din;
+    wire [7:0] dout;
+
+    Single_Port_RAM uut (
+        .clk(clk),
+        .we(we),
+        .addr(addr),
+        .din(din),
+        .dout(dout)
+    );
+
+    initial begin
+        clk = 0;
+        forever #5 clk = ~clk;
+    end
+
+    initial begin
+        we = 1; addr = 4'd0; din = 8'd15; #10;
+        we = 1; addr = 4'd1; din = 8'd25; #10;
+        we = 1; addr = 4'd2; din = 8'd35; #10;
+        we = 0; addr = 4'd0; #10;
+        we = 0; addr = 4'd1; #10;
+        we = 0; addr = 4'd2; #10;
+        $finish;
+    end
+
+    initial begin
+        $monitor("Time=%0d addr=%d din=%d dout=%d we=%b", $time, addr, din, dout, we);
+    end
+endmodule
