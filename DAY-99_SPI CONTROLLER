@@ -1,0 +1,136 @@
+RTL CODE :
+`timescale 1ns / 1ps
+//Date : 16/12/2024
+//Name : Charan Kopparla 
+
+
+module SPI_Controller (
+    input wire clk,               // System clock
+    input wire reset,             // Reset signal
+    input wire [7:0] data_in,     // Data to be transmitted
+    input wire start,             // Start signal to begin transmission
+    output reg [7:0] data_out,    // Data received from SPI slave
+    output reg sclk,              // SPI clock
+    output reg mosi,              // Master Out Slave In
+    input wire miso,              // Master In Slave Out
+    output reg cs                 // Chip Select (active low)
+);
+    // Internal registers
+    reg [7:0] shift_reg;          // Shift register for transmitting/receiving
+    reg [2:0] bit_count;          // Bit counter for 8-bit data
+    reg busy;                     // Busy flag
+
+    // SPI clock divider
+    reg [2:0] clk_div;            // Divide system clock for SPI clock
+    wire spi_clk_en = (clk_div == 3'b000); // Enable SPI clock
+
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            clk_div <= 3'b000;
+        end else begin
+            clk_div <= clk_div + 1;
+        end
+    end
+    // State Machine
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            sclk <= 0;
+            cs <= 1; // Chip select is inactive
+            mosi <= 0;
+            data_out <= 8'b0;
+            busy <= 0;
+            bit_count <= 0;
+        end else begin
+            if (start && !busy) begin
+                // Start transmission
+                busy <= 1;
+                cs <= 0; // Activate chip select
+                shift_reg <= data_in;
+                bit_count <= 3'b111;
+            end else if (busy && spi_clk_en) begin
+                // SPI clock toggle
+                sclk <= ~sclk;
+
+                if (!sclk) begin
+                    // Transmit bit on falling edge of sclk
+                    mosi <= shift_reg[7];
+                    shift_reg <= {shift_reg[6:0], miso};
+                    bit_count <= bit_count - 1;
+                end
+
+                if (bit_count == 3'b000) begin
+                    // Transmission complete
+                    busy <= 0;
+                    cs <= 1; // Deactivate chip select
+                    data_out <= shift_reg; // Capture received data
+                end
+            end
+       end
+    end
+endmodule
+
+TEST BENCH :
+`timescale 1ns / 1ps
+//Date : 16/12/2024
+//Name : Charan Kopparla 
+
+module tb_SPI_Controller;
+    reg clk;
+    reg reset;
+    reg [7:0] data_in;
+    reg start;
+    wire [7:0] data_out;
+    wire sclk;
+    wire mosi;
+    reg miso;
+    wire cs;
+
+    // Instantiate the SPI Controller
+    SPI_Controller uut (
+        .clk(clk),
+        .reset(reset),
+        .data_in(data_in),
+        .start(start),
+        .data_out(data_out),
+        .sclk(sclk),
+        .mosi(mosi),
+        .miso(miso),
+        .cs(cs)
+    );
+    // Clock generation
+    initial clk = 0;
+    always #5 clk = ~clk; // 100 MHz clock
+
+    // Test sequence
+    initial begin
+        $dumpfile("spi_controller.vcd");
+        $dumpvars(0, tb_SPI_Controller);
+
+        reset = 1; start = 0; data_in = 8'b0; miso = 0;
+        #20 reset = 0;
+
+        // Transmit 0xA5 and simulate response 0x3C from slave
+        data_in = 8'hA5;
+        #10 start = 1; #10 start = 0;
+
+        repeat (16) begin
+            #10 miso = $random % 2; // Simulate slave sending random data
+        end
+
+        #100;
+
+        // Transmit 0xF0 and simulate response 0xC3 from slave
+        data_in = 8'hF0;
+        #10 start = 1; #10 start = 0;
+
+        repeat (16) begin
+            #10 miso = $random % 2; // Simulate slave sending random data
+        end
+        
+        #100;
+        $finish;
+    end
+endmodule
+
+    
+    
