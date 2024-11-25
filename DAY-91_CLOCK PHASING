@@ -1,0 +1,57 @@
+RTL CODE :
+`timescale 1ns / 1ps
+//Date : 8/12/2024
+//Name : Charan Kopparla 
+module clock_phasing (
+    input clk,        // Original clock input
+    input reset,      // Reset signal
+    output reg clk_out // Shifted clock output (180-degree phase shift)
+);
+
+    reg [1:0] clk_div; // Counter for clock division
+
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            clk_div <= 2'b00;
+            clk_out <= 0;
+        end else begin
+            clk_div <= clk_div + 1;
+            if (clk_div == 2'b00) begin
+                clk_out <= ~clk_out;  // Flip the output clock every 2 cycles (180-degree shift)
+            end
+        end
+    end
+
+endmodule
+
+TEST BENCH :
+`timescale 1ns / 1ps
+//Date : 8/12/2024
+//Name : Charan Kopparla 
+
+`timescale 1ns / 1ps
+
+module tb_clock_phasing;
+    reg clk;
+    reg reset;
+    wire clk_out;
+
+    clock_phasing uut (
+        .clk(clk),
+        .reset(reset),
+        .clk_out(clk_out)
+    );
+
+    initial begin
+        clk = 0;
+        forever #5 clk = ~clk; // 10ns period (100 MHz clock)
+    end
+
+    initial begin
+        reset = 1; #10;
+        reset = 0;
+
+        #100 $finish;
+    end
+endmodule
+
