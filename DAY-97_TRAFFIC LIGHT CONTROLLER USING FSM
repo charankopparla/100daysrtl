@@ -1,0 +1,85 @@
+RTL CODE :
+`timescale 1ns / 1ps
+//Date : 14/12/2024
+//Name : Charan Kopparla 
+
+module traffic_light_fsm (
+    input clk, reset,
+    output reg [1:0] light1, light2 // 2-bit output for each light
+);
+    reg [1:0] state, next_state;
+
+    // State transition logic (synchronous)
+    always @(posedge clk or posedge reset) begin
+        if (reset) 
+            state <= 2'b00; // Initial state
+        else 
+            state <= next_state;
+    end
+
+    // State machine logic (combinational)
+    always @(*) begin
+        case (state)
+            2'b00: next_state = 2'b01; // Green light for light1, Red for light2
+            2'b01: next_state = 2'b10; // Yellow light for light1, Red for light2
+            2'b10: next_state = 2'b00; // Red light for light1, Green for light2
+            default: next_state = 2'b00;
+        endcase
+    end
+
+    // Light control logic (outputs based on state)
+    always @(state) begin
+        case (state)
+            2'b00: begin
+                light1 = 2'b01;  // Green light for light1
+                light2 = 2'b10;  // Red light for light2
+            end
+            2'b01: begin
+                light1 = 2'b10;  // Yellow light for light1
+                light2 = 2'b10;  // Red light for light2
+            end
+            2'b10: begin
+                light1 = 2'b00;  // Red light for light1
+                light2 = 2'b01;  // Green light for light2
+            end
+            default: begin
+                light1 = 2'b00;
+                light2 = 2'b00;
+            end
+        endcase
+    end
+endmodule
+
+
+TEST BENCH :
+`timescale 1ns / 1ps
+//Date : 14/12/2024
+//Name : Charan Kopparla
+
+module tb_traffic_light_fsm;
+    reg clk, reset;
+    wire [1:0] light1, light2;
+
+    traffic_light_fsm uut (
+        .clk(clk),
+        .reset(reset),
+        .light1(light1),
+        .light2(light2)
+    );
+
+    initial begin
+        // Initialize signals
+        clk = 0;
+        reset = 1;  // Start with reset active
+        #5 reset = 0;  // Deassert reset after 5ns
+        #100 $finish;  // Finish simulation after 100ns
+    end
+
+    // Clock generation (period of 10ns)
+    always #5 clk = ~clk;
+    
+    // Display the output for observation
+    initial begin
+        $monitor("Time = %0t | State = %b | Light1 = %b | Light2 = %b", $time, uut.state, light1, light2);
+    end
+endmodule
