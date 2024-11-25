@@ -1,0 +1,54 @@
+RTL CODE :
+`timescale 1ns / 1ps
+//Date : 1/12/2024
+//Name : Charan Kopparla 
+
+module Fixed_Priority_Arbiter #(
+    parameter NUM_REQUESTS = 4
+)(
+    input [NUM_REQUESTS-1:0] requests,
+    output reg [NUM_REQUESTS-1:0] grants
+);
+
+    always @(*) begin
+        grants = 0;
+        casez (requests)
+            4'b1???: grants = 4'b1000;
+            4'b01??: grants = 4'b0100;
+            4'b001?: grants = 4'b0010;
+            4'b0001: grants = 4'b0001;
+            default: grants = 4'b0000;
+        endcase
+    end
+endmodule
+
+
+TEST BENCH :
+`timescale 1ns / 1ps
+//Date : 1/12/2024
+//Name : Charan Kopparla 
+
+module Fixed_Priority_Arbiter_tb;
+
+    reg [3:0] requests;
+    wire [3:0] grants;
+
+    Fixed_Priority_Arbiter uut (
+        .requests(requests),
+        .grants(grants)
+    );
+
+    initial begin
+        requests = 4'b0000; #10;
+        requests = 4'b0001; #10;
+        requests = 4'b0011; #10;
+        requests = 4'b0100; #10;
+        requests = 4'b1000; #10;
+        requests = 4'b1111; #10;
+        $finish;
+    end
+
+    initial begin
+        $monitor("Time=%0d requests=%b grants=%b", $time, requests, grants);
+    end
+endmodule
