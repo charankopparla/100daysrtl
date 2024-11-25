@@ -1,0 +1,75 @@
+RTL CODE :
+`timescale 1ns / 1ps
+//Date : 9/12/2024
+//Name : Charan Kopparla 
+
+module triangle_wave_generator (
+    input clk,           // Clock input
+    input reset,         // Reset input
+    input [7:0] max_val, // Maximum value for the triangle wave
+    output reg [7:0] wave_out // Triangle wave output
+);
+
+    reg [7:0] counter;  // Counter for generating the wave
+    reg direction;      // Direction of the counter (up or down)
+
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            counter <= 0;
+            direction <= 0; // Start by increasing
+            wave_out <= 0;
+        end else begin
+            if (direction == 0) begin
+                if (counter < max_val) begin
+                    counter <= counter + 1; // Increase counter
+                end else begin
+                    direction <= 1; // Switch direction to decreasing
+                    counter <= counter - 1;
+                end
+            end else begin
+                if (counter > 0) begin
+                    counter <= counter - 1; // Decrease counter
+                end else begin
+                    direction <= 0; // Switch direction to increasing
+                    counter <= counter + 1;
+                end
+            end
+
+            wave_out <= counter; // Output the counter value as the triangle wave
+        end
+    end
+
+endmodule
+
+
+TEST BENCH :
+
+`timescale 1ns / 1ps
+//Date : 9/12/2024
+//Name : Charan Kopparla 
+
+module tb_triangle_wave_generator;
+    reg clk;
+    reg reset;
+    reg [7:0] max_val;
+    wire [7:0] wave_out;
+
+    triangle_wave_generator uut (
+        .clk(clk),
+        .reset(reset),
+        .max_val(max_val),
+        .wave_out(wave_out)
+    );
+
+    initial begin
+        clk = 0;
+        forever #5 clk = ~clk; // 10ns clock period (100 MHz clock)
+    end
+
+    initial begin
+        reset = 1; max_val = 8'd15; #10; // Set the maximum value of the triangle wave
+        reset = 0;
+        
+        #200 $finish;
+    end
+endmodule
