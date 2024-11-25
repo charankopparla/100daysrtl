@@ -1,0 +1,99 @@
+RTL CODE :
+`timescale 1ns / 1ps
+//Date : 30/11/2024
+//Name : Charan Kopparla 
+
+module Synchronous_FIFO #(
+    parameter DATA_WIDTH = 8,
+    parameter FIFO_DEPTH = 16
+)(
+    input clk,
+    input reset,
+    input wr_en,
+    input rd_en,
+    input [DATA_WIDTH-1:0] din,
+    output reg [DATA_WIDTH-1:0] dout,
+    output full,
+    output empty
+);
+
+    reg [DATA_WIDTH-1:0] mem [FIFO_DEPTH-1:0];
+    reg [$clog2(FIFO_DEPTH):0] wr_ptr = 0;
+    reg [$clog2(FIFO_DEPTH):0] rd_ptr = 0;
+    reg [$clog2(FIFO_DEPTH):0] count = 0;
+
+    assign full = (count == FIFO_DEPTH);
+    assign empty = (count == 0);
+
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            wr_ptr <= 0;
+            rd_ptr <= 0;
+            count <= 0;
+        end else begin
+            if (wr_en && !full) begin
+                mem[wr_ptr] <= din;
+                wr_ptr <= wr_ptr + 1;
+                count <= count + 1;
+            end
+            if (rd_en && !empty) begin
+                dout <= mem[rd_ptr];
+                rd_ptr <= rd_ptr + 1;
+                count <= count - 1;
+            end
+        end
+    end
+endmodule
+
+
+TEST BENCH :
+`timescale 1ns / 1ps
+//Date : 30/11/2024
+//Name : Charan Kopparla 
+
+module Synchronous_FIFO_tb;
+
+    reg clk;
+    reg reset;
+    reg wr_en;
+    reg rd_en;
+    reg [7:0] din;
+    wire [7:0] dout;
+    wire full;
+    wire empty;
+
+    Synchronous_FIFO #(
+        .DATA_WIDTH(8),
+        .FIFO_DEPTH(16)
+    ) uut (
+        .clk(clk),
+        .reset(reset),
+        .wr_en(wr_en),
+        .rd_en(rd_en),
+        .din(din),
+        .dout(dout),
+        .full(full),
+        .empty(empty)
+    );
+
+    initial begin
+        clk = 0;
+        forever #5 clk = ~clk;
+    end
+
+    initial begin
+        reset = 1; #10;
+        reset = 0; wr_en = 1; rd_en = 0; din = 8'hA5; #10;
+        din = 8'h5A; #10;
+        din = 8'hFF; #10;
+        wr_en = 0; rd_en = 1; #10;
+        #10;
+        rd_en = 0; #10;
+        $finish;
+    end
+
+    initial begin
+        $monitor("Time=%0d wr_en=%b rd_en=%b din=%h dout=%h full=%b empty=%b", $time, wr_en, rd_en, din, dout, full, empty);
+    end
+endmodule
+
