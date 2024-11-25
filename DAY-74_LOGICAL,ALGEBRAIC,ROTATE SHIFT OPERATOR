@@ -1,0 +1,64 @@
+RTL CODE :
+`timescale 1ns / 1ps
+//Date : 22/11/2024
+//Name : Charan Kopparla
+module Shift_Operations (
+    input [3:0] data_in,
+    input [1:0] shift_type,
+    input [1:0] shift_amount,
+    output reg [3:0] data_out
+);
+
+    always @(*) begin
+        case (shift_type)
+            2'b00: data_out = data_in << shift_amount;
+            2'b01: data_out = data_in >> shift_amount;
+            2'b10: data_out = $signed(data_in) >>> shift_amount;
+            2'b11: data_out = (data_in << shift_amount) | (data_in >> (4 - shift_amount));
+            default: data_out = data_in;
+        endcase
+    end
+endmodule
+
+TEST BENCH :
+
+`timescale 1ns / 1ps
+//Date : 22/11/2024
+//Name : Charan Kopparla
+
+
+module Shift_Operations_tb;
+
+    reg [3:0] data_in;
+    reg [1:0] shift_type;
+    reg [1:0] shift_amount;
+    wire [3:0] data_out;
+
+    Shift_Operations uut (
+        .data_in(data_in),
+        .shift_type(shift_type),
+        .shift_amount(shift_amount),
+        .data_out(data_out)
+    );
+
+    initial begin
+        data_in = 4'b1010; shift_type = 2'b00; shift_amount = 2'b01; #10;
+        data_in = 4'b1101; shift_type = 2'b00; shift_amount = 2'b10; #10;
+        data_in = 4'b1010; shift_type = 2'b01; shift_amount = 2'b01; #10;
+        data_in = 4'b1101; shift_type = 2'b01; shift_amount = 2'b10; #10;
+        data_in = 4'b1010; shift_type = 2'b10; shift_amount = 2'b01; #10;
+        data_in = 4'b1101; shift_type = 2'b10; shift_amount = 2'b10; #10;
+        data_in = 4'b1010; shift_type = 2'b11; shift_amount = 2'b01; #10;
+        data_in = 4'b1101; shift_type = 2'b11; shift_amount = 2'b10; #10;
+        $finish;
+    end
+
+    initial begin
+        $monitor("Time=%0d data_in=%b shift_type=%b shift_amount=%b data_out=%b", 
+                 $time, data_in, shift_type, shift_amount, data_out);
+    end
+endmodule
+
+
+
+          
