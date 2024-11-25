@@ -1,0 +1,71 @@
+RTL CODE :
+`timescale 1ns / 1ps
+//Date : 4/12/2024
+//Name : Charan Kopparla
+
+module timer_24hr (
+    input clk,
+    input reset,
+    output reg [4:0] hours,
+    output reg [5:0] minutes,
+    output reg [5:0] seconds
+);
+
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            hours <= 1;
+            minutes <= 0;
+            seconds <= 0;
+        end else begin
+            if (seconds == 59) begin
+                seconds <= 0;
+                if (minutes == 59) begin
+                    minutes <= 0;
+                    if (hours == 23) begin
+                        hours <= 0;
+                    end else begin
+                        hours <= hours + 1;
+                    end
+                end else begin
+                    minutes <= minutes + 1;
+                end
+            end else begin
+                seconds <= seconds + 1;
+            end
+        end
+    end
+endmodule
+
+TEST BENCH :
+`timescale 1ns / 1ps
+//Date : 4/12/2024
+//Name : Charan Kopparla
+
+module tb_timer_24hr;
+    reg clk;
+    reg reset;
+    wire [4:0] hours;
+    wire [5:0] minutes;
+    wire [5:0] seconds;
+
+    timer_24hr uut (
+        .clk(clk),
+        .reset(reset),
+        .hours(hours),
+        .minutes(minutes),
+        .seconds(seconds)
+    );
+
+    initial begin
+        clk = 0;
+        forever #5 clk = ~clk;
+    end
+
+    initial begin
+        reset = 1; #10;
+        reset = 0;
+
+        #100 $finish;
+    end
+endmodule
+
