@@ -1,0 +1,55 @@
+RTL CODE :
+`timescale 1ns / 1ps
+//Date:10/11/2024
+//Name: Charan Kopparla
+
+module sub_8_bit(
+    input [7:0]a,
+    input [7:0]b,
+    output [7:0] out);
+   reg [7:0] out;
+   reg [7:0] neg_b;
+   always @(*)
+    begin 
+     neg_b = ~b+1;
+     out = a + neg_b;
+    end 
+endmodule
+
+TEST BENCH :
+`timescale 1ns / 1ps
+// Date: 10/11/2024
+// Name: Charan Kopparla
+
+module sub_8_bit_tb();
+    reg [7:0] a;
+    reg [7:0] b;
+    wire [7:0] out;
+
+    sub_8_bit uut (
+        .a(a),
+        .b(b),
+        .out(out)
+    );
+
+    initial begin
+        a = 8'b00001111;
+        b = 8'b00000001;
+        #10;
+        a = 8'b10000000;
+        b = 8'b00000001;
+        #10;
+        a = 8'b01010101;
+        b = 8'b00010001;
+        #10;
+        a = 8'b11111111;
+        b = 8'b00000001;
+        #10;
+        a = 8'b00000000;
+        b = 8'b00000001;
+        #10;
+
+        $finish;
+    end
+endmodule
+
