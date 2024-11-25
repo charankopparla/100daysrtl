@@ -1,0 +1,51 @@
+RTL CODE:
+`timescale 1ns / 1ps
+//Date : 3/11/2024
+//Name : Charan Kopparla
+
+module bcd_counter(
+    input clk ,rst,
+    output reg [3:0]count );
+    
+    always@(posedge clk or posedge rst)
+     begin 
+       if(rst)
+       begin
+        count <= 4'b0000;
+       end
+       else if (count == 4'b1001)
+         begin  
+          count <= 4'b0000;
+         end 
+       else 
+        begin 
+          count <= count+1;
+        end 
+     end 
+  
+endmodule
+
+TEST BENCH :
+`timescale 1ns / 1ps
+//Date : 3/11/2024
+//Name : Charan Kopparla 
+
+
+module bcd_counter_tb();
+   reg clk,rst;
+   wire [3:0] count;
+   
+ bcd_counter dut(clk,rst,count);
+ 
+ initial clk = 0;
+ always #5 clk = ~clk;
+ 
+ initial begin 
+    rst = 1;
+    #10;
+    rst = 0;
+    #200;
+    $finish();
+    end 
+    
+endmodule
