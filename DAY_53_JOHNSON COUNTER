@@ -1,0 +1,48 @@
+RTL CODE :
+`timescale 1ns / 1ps
+//Date : 30/10/2024
+//Name : Charan Kopparla 
+
+
+module Johnson_counter(
+    input clk,rst,
+    output [3:0] count);
+
+    reg [3:0] q;
+    
+    always@(posedge clk or posedge rst)
+     begin 
+      if(rst)
+       q <=  4'b0000;
+      else begin 
+       q[3] <= ~q[0];
+       q[2] <= q[3];
+       q[1] <= q[2];
+       q[0] <= q[1];
+       end
+      end 
+      assign count = q;
+endmodule
+
+TEST BENCH :
+`timescale 1ns / 1ps
+//Date : 30/10/2024
+//Name : Charan Kopparla 
+
+
+module johnson_counter_tb();
+    reg clk,rst;
+    wire [3:0] count;
+    
+Johnson_counter dut(clk,rst,count);
+    initial clk = 0;
+    always #5 clk = ~clk;
+    
+    initial begin 
+     rst = 1;
+     #10;
+     rst = 0;
+     #100;
+     $finish();
+     end
+endmodule
