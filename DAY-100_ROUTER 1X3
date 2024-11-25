@@ -1,0 +1,61 @@
+RTL CODE :
+`timescale 1ns / 1ps
+//Date : 17/12/2024
+//Name : Charan Kopparla 
+
+module Router_1x3 (
+    input wire [7:0] data_in,   // Input data
+    input wire [1:0] sel,       // Select signal to choose output port
+    output reg [7:0] out0,      // Output port 0
+    output reg [7:0] out1,      // Output port 1
+    output reg [7:0] out2       // Output port 2
+);
+    always @(*) begin
+        // Initialize outputs to zero
+        out0 = 8'b0;
+        out1 = 8'b0;
+        out2 = 8'b0;
+
+        // Route input data based on select signal
+        case (sel)
+            2'b00: out0 = data_in; // Route to output 0
+            2'b01: out1 = data_in; // Route to output 1
+            2'b10: out2 = data_in; // Route to output 2
+            default: ;             // No output for other cases
+        endcase
+    end
+endmodule
+
+TEST BENCH :
+`timescale 1ns / 1ps
+//Date : 17/12/2024
+//Name : Charan Kopparla 
+
+module tb_Router_1x3;
+    reg [7:0] data_in;
+    reg [1:0] sel;
+    wire [7:0] out0, out1, out2;
+
+    // Instantiate the Router
+    Router_1x3 uut (
+        .data_in(data_in),
+        .sel(sel),
+        .out0(out0),
+        .out1(out1),
+        .out2(out2)
+    );
+
+    // Test sequence
+    initial begin
+        $dumpfile("router_1x3.vcd");
+        $dumpvars(0, tb_Router_1x3);
+
+        // Initialize inputs
+        data_in = 8'hAA; sel = 2'b00; #10; // Route to out0
+        data_in = 8'hBB; sel = 2'b01; #10; // Route to out1
+        data_in = 8'hCC; sel = 2'b10; #10; // Route to out2
+        data_in = 8'hDD; sel = 2'b11; #10; // No routing (default case)
+
+        $finish;
+    end
+endmodule
