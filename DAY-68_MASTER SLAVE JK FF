@@ -1,0 +1,90 @@
+RTL CODE :
+`timescale 1ns / 1ps
+//Date : 14/11/2024
+//Name : Charan Kopparla 
+
+module master_slave_jk_ff (
+    input clk,          // Clock input
+    input j,            // J input
+    input k,            // K input
+    output reg q,       // Q output
+    output reg q_bar    // Q' (inverted Q) output
+);
+    reg master_q; // Intermediate output of the master flip-flop
+
+    // Master flip-flop (triggered on rising edge of the clock)
+    always @(posedge clk) begin
+        if (j == 0 && k == 1)
+            master_q <= 0;
+        else if (j == 1 && k == 0)
+            master_q <= 1;
+        else if (j == 1 && k == 1)
+            master_q <= ~master_q; // Toggle
+    end
+
+    // Slave flip-flop (triggered on falling edge of the clock)
+    always @(negedge clk) begin
+        q <= master_q;
+        q_bar <= ~master_q;
+    end
+endmodule
+
+
+TEST BENCH :
+`timescale 1ns / 1ps
+//Date : 14/11/2024
+//Name : Charan Kopparla 
+
+module tb_master_slave_jk_ff;
+    reg clk;
+    reg j;
+    reg k;
+    wire q;
+    wire q_bar;
+
+    // Instantiate the master-slave JK flip-flop
+    master_slave_jk_ff uut (
+        .clk(clk),
+        .j(j),
+        .k(k),
+        .q(q),
+        .q_bar(q_bar)
+    );
+
+    // Generate clock signal
+    initial begin
+        clk = 0;
+        forever #5 clk = ~clk; // 10 time units period
+    end
+
+    // Test cases
+    initial begin
+        // Initialize inputs
+        j = 0; k = 0;
+        #10;
+
+        // Test case 1: j = 0, k = 1 (Reset)
+        j = 0; k = 1;
+        #10;
+
+        // Test case 2: j = 1, k = 0 (Set)
+        j = 1; k = 0;
+        #10;
+
+        // Test case 3: j = 1, k = 1 (Toggle)
+        j = 1; k = 1;
+        #10;
+
+        // Test case 4: j = 0, k = 0 (No change)
+        j = 0; k = 0;
+        #10;
+
+        // End simulation
+        $finish;
+    end
+
+    // Monitor output
+    initial begin
+        $monitor("Time: %0t | J: %b | K: %b | Q: %b | Q': %b", $time, j, k, q, q_bar);
+    end
+endmodule
