@@ -1,0 +1,60 @@
+RTL CODE:
+`timescale 1ns / 1ps
+//Date: 11/11/2024
+//Name : Charan Kopparla 
+module addr_sub_8bit(
+    input[7:0] a,b,
+    input clk,
+    output reg [7:0] out,
+    output cr,
+    input mode
+    );
+    
+    always@(*)
+     begin 
+      case(mode)
+        0 : out = a+b;
+        1 : out = a-b;
+      endcase 
+     end
+       
+endmodule
+
+TEST BENCH :
+`timescale 1ns / 1ps
+//Date : 11/11/2024
+//Name : Charan Kopparla
+
+module addr_sub_8bit_tb();
+    reg [7:0] a,b;
+    reg clk;
+    wire [7:0] out;
+    wire cr;
+    reg mode;
+    
+    addr_sub_8bit dut(a,b,clk,out,cr,mode);
+    initial clk=0;
+    always #5 clk=~clk;
+    
+    initial begin 
+     mode = 0;
+     a = 2;
+     b = 2;
+     #10;
+     mode = 1;
+     a = 3;
+     b = 1;
+     #10;
+     mode = 0;
+     a = 4;
+     b = 1;
+     mode = 1;
+     a = 2;
+     b = 1;
+     #10;
+    
+      #100;
+      $finish();
+      end
+      
+endmodule
