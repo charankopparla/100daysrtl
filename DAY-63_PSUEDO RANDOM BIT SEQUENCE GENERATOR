@@ -1,0 +1,58 @@
+RTL CODE :
+`timescale 1ns / 1ps
+// Date : 9/11/2024
+// Name : Charan Kopparla 
+
+module prbs_generator(
+    input clk,
+    input rst,
+    output [7:0] rand
+);
+
+reg [7:0] temp;
+
+always @(posedge clk or posedge rst) begin
+    if (rst)
+        temp <= 8'b00000001;  
+    else begin
+       
+        temp <= {temp[6:0], temp[7] ^ temp[5]};
+    end
+end
+
+assign rand = temp;
+
+endmodule
+
+
+TEST BENCH :
+`timescale 1ns / 1ps
+// Date : 9/11/2024
+// Name : Charan Kopparla 
+
+module prbs_generator_tb();
+    reg clk;
+    reg rst;
+    wire [7:0] rand;
+
+    prbs_generator dut (
+        .clk(clk),
+        .rst(rst),
+        .rand(rand)
+    );
+
+    initial clk = 0;
+    always #5 clk = ~clk;
+
+    initial begin
+       
+        rst = 1;
+        #10;
+        
+        rst = 0;
+        
+        #100;
+        
+        $finish;
+    end
+endmodule
