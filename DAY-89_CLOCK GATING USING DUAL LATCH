@@ -1,0 +1,67 @@
+RTL CODE :
+`timescale 1ns / 1ps
+//Date : 6/12/2024
+//Name : Charan Kopparla 
+module clock_gating (
+    input clk,       // Original clock
+    input enable,    // Enable signal
+    input reset,     // Reset signal
+    output gated_clk // Gated clock
+);
+
+    reg latch1, latch2;
+
+    always @(posedge clk or posedge reset) begin
+        if (reset) 
+            latch1 <= 0;
+        else 
+            latch1 <= enable;
+    end
+
+    always @(negedge clk or posedge reset) begin
+        if (reset) 
+            latch2 <= 0;
+        else 
+            latch2 <= latch1;
+    end
+
+    assign gated_clk = clk & latch2;
+
+endmodule
+
+TEST BENCH :
+`timescale 1ns / 1ps
+//Date : 6/12/2024
+//Name : Charan Kopparla 
+
+`timescale 1ns / 1ps
+
+module tb_clock_gating;
+    reg clk;
+    reg enable;
+    reg reset;
+    wire gated_clk;
+
+    clock_gating uut (
+        .clk(clk),
+        .enable(enable),
+        .reset(reset),
+        .gated_clk(gated_clk)
+    );
+
+    initial begin
+        clk = 0;
+        forever #5 clk = ~clk; // Generate a clock signal with 10ns period
+    end
+
+    initial begin
+        reset = 1; enable = 0; #10;
+        reset = 0; enable = 1; #50;
+        enable = 0; #50;
+        enable = 1; #50;
+        reset = 1; #10;
+        reset = 0; enable = 0; #50;
+
+        $finish;
+    end
+endmodule
