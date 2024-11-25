@@ -1,0 +1,53 @@
+RTL CODE:
+`timescale 1ns / 1ps
+//Date : 7/12/2024
+//Name : Charan Kopparla 
+module fibonacci_generator (
+    input clk,
+    input reset,
+    output reg [31:0] current, // Current Fibonacci number
+    output reg [31:0] next     // Next Fibonacci number
+);
+
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            current <= 0;
+            next <= 1;
+        end else begin
+            {current, next} <= {next, current + next};
+        end
+    end
+endmodule
+
+TEST BENCH :
+`timescale 1ns / 1ps
+//Date : 7/12/2024
+//Name : Charan Kopparla 
+
+`timescale 1ns / 1ps
+
+module tb_fibonacci_generator;
+    reg clk;
+    reg reset;
+    wire [31:0] current;
+    wire [31:0] next;
+
+    fibonacci_generator uut (
+        .clk(clk),
+        .reset(reset),
+        .current(current),
+        .next(next)
+    );
+
+    initial begin
+        clk = 0;
+        forever #5 clk = ~clk; // Clock period of 10ns
+    end
+
+    initial begin
+        reset = 1; #10;
+        reset = 0;
+
+        #100 $finish;
+    end
+endmodule
