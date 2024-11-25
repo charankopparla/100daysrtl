@@ -1,0 +1,79 @@
+RTL CODE :
+`timescale 1ns / 1ps
+//Date : 25/11/2024
+//Name : Charan Kopparla 
+
+module GCD (
+    input [7:0] a,        
+    input [7:0] b,        
+    input clk,             
+    input start,           
+    output reg [7:0] gcd,  
+    output reg done        
+);
+
+    reg [7:0] x, y;
+    reg calculating;
+
+    always @(posedge clk) begin
+        if (start) begin
+            x <= a;
+            y <= b;
+            calculating <= 1;
+            done <= 0;
+        end else if (calculating) begin
+            if (x == y) begin
+                gcd <= x;
+                done <= 1;
+                calculating <= 0;
+            end else if (x > y) begin
+                x <= x - y;
+            end else begin
+                y <= y - x;
+            end
+        end
+    end
+endmodule
+
+TEST BENCH :
+`timescale 1ns/1ps
+//Date : 25/11/2024
+//Name : Charan Kopparla 
+
+module GCD_tb;
+
+    reg [7:0] a;
+    reg [7:0] b;
+    reg clk;
+    reg start;
+    wire [7:0] gcd;
+    wire done;
+
+    GCD uut (
+        .a(a),
+        .b(b),
+        .clk(clk),
+        .start(start),
+        .gcd(gcd),
+        .done(done)
+    );
+
+    initial begin
+        clk = 0;
+        forever #5 clk = ~clk;
+    end
+
+    initial begin
+        a = 8'd56; b = 8'd98; start = 1; #10; start = 0;
+        wait(done);
+        #10;
+        a = 8'd20; b = 8'd30; start = 1; #10; start = 0;
+        wait(done);
+        #10;
+        $finish;
+    end
+
+    initial begin
+        $monitor("Time=%0d a=%d b=%d gcd=%d done=%b", $time, a, b, gcd, done);
+    end
+endmodule
