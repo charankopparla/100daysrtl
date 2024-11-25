@@ -1,0 +1,66 @@
+RTL CODE :
+`timescale 1ns / 1ps
+//Date : 17/11/2024
+//Name : Charan Kopparla
+
+module bcd_timecount (
+    input clk,
+    input rst,
+    output reg [3:0] tens,  // Tens digit in BCD
+    output reg [3:0] units  // Units digit in BCD
+);
+
+    always @(posedge clk or posedge rst) begin
+        if (rst) begin
+            tens <= 4'd0;
+            units <= 4'd0;
+        end else begin
+            if (units == 4'd9) begin
+                units <= 4'd0;
+                if (tens == 4'd5) begin
+                    tens <= 4'd0;
+                end else begin
+                    tens <= tens + 1;
+                end
+            end else begin
+                units <= units + 1;
+            end
+        end
+    end
+endmodule
+
+TEST BENCH :
+ `timescale 1ns / 1ps
+//Date : 16/11/2024
+//Name : Charan Kopparla
+`timescale 1ns / 1ps
+
+module tb_bcd_timecount;
+    reg clk;
+    reg rst;
+    wire [3:0] tens;
+    wire [3:0] units;
+
+    bcd_timecount uut (
+        .clk(clk),
+        .rst(rst),
+        .tens(tens),
+        .units(units)
+    );
+
+    initial begin
+        clk = 0;
+        forever #5 clk = ~clk; // Clock period of 10 time units
+    end
+
+    initial begin
+        rst = 1;
+        #10 rst = 0; // Release reset
+        #600;        // Simulate for 600 time units
+        $finish;
+    end
+
+    initial begin
+        $monitor("Time: %0t | Reset: %b | Tens: %d | Units: %d", $time, rst, tens, units);
+    end
+endmodule
