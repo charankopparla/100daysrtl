@@ -1,0 +1,127 @@
+RTL CODE :
+`timescale 1ns / 1ps
+//Date : 15/12/2024
+//Name : Charan Kopparla 
+
+module stopwatch (
+    input clk, reset, start_stop,
+    output reg [5:0] seconds, minutes,
+    output reg [3:0] hours
+);
+    reg running;
+    reg [5:0] sec_count;
+    reg [5:0] min_count;
+    reg [3:0] hour_count;
+
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            sec_count <= 0;
+            min_count <= 0;
+            hour_count <= 0;
+            seconds <= 0;
+            minutes <= 0;
+            hours <= 0;
+            running <= 0;
+        end else if (start_stop) begin
+            running <= ~running;
+        end else if (running) begin
+            sec_count <= sec_count + 1;
+            if (sec_count == 60) begin
+                sec_count <= 0;
+                min_count <= min_count + 1;
+                if (min_count == 60) begin
+                    min_count <= 0;
+                    hour_count <= hour_count + 1;
+                    if (hour_count == 24) begin
+                        hour_count <= 0;
+                    end
+                end
+            end
+        end
+    end
+
+    always @(sec_count or min_count or hour_count) begin
+        seconds <= sec_count;
+        minutes <= min_count;
+        hours <= hour_count;
+    end
+endmodule
+
+
+TEST BENCH :
+`timescale 1ns / 1ps
+//Date : 15/12/2024
+//Name : Charan Kopparla 
+
+`timescale 1ns / 1ps
+
+module tb_stopwatch;
+
+    // Inputs
+    reg clk;
+    reg reset;
+    reg start_stop;
+
+    // Outputs
+    wire [5:0] seconds;
+    wire [5:0] minutes;
+    wire [3:0] hours;
+
+    // Instantiate the stopwatch module
+    stopwatch uut (
+        .clk(clk),
+        .reset(reset),
+        .start_stop(start_stop),
+        .seconds(seconds),
+        .minutes(minutes),
+        .hours(hours)
+    );
+
+    // Clock generation (period = 10ns)
+    always #5 clk = ~clk;
+
+    // Test procedure
+    initial begin
+        // Initialize inputs
+        clk = 0;
+        reset = 0;
+        start_stop = 0;
+        
+        // Apply reset
+        reset = 1;    // Reset the stopwatch
+        #10;           // Wait for 10ns
+        reset = 0;     // Release reset
+
+        // Test 1: Start the stopwatch
+        start_stop = 1; // Start the stopwatch
+        #100;           // Wait for 100ns (simulate 10 clock cycles)
+        
+        // Test 2: Stop the stopwatch
+        start_stop = 1; // Stop the stopwatch
+        #50;            // Wait for 50ns (simulate 5 clock cycles)
+
+        // Test 3: Start the stopwatch again
+        start_stop = 1; // Start the stopwatch again
+        #100;           // Wait for 100ns (simulate 10 clock cycles)
+        
+        // Test 4: Stop the stopwatch
+        start_stop = 1; // Stop the stopwatch
+        #30;            // Wait for 30ns (simulate 3 clock cycles)
+
+        // Test 5: Reset the stopwatch
+        reset = 1;      // Reset the stopwatch
+        #10;            // Wait for 10ns
+        reset = 0;      // Release reset
+
+        // Finish the simulation
+        #10;
+        $finish;
+    end
+
+    // Monitor the outputs
+    initial begin
+        $monitor("Time: %d:%d:%d | Seconds: %d | Minutes: %d | Hours: %d",
+                 hours, minutes, seconds, seconds, minutes, hours);
+    end
+
+endmodule
