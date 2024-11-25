@@ -1,0 +1,56 @@
+RTL CODE:
+`timescale 1ns / 1ps
+//Date : 15/11/2024
+//Name : Charan Kopparla 
+
+module pos_edge_detector (
+    input clk,
+    input signal,
+    output reg edge_detected
+);
+    reg signal_delayed;
+
+    always @(posedge clk) begin
+        signal_delayed <= signal;
+        edge_detected <= signal & ~signal_delayed;
+    end
+endmodule
+
+
+TEST BENCH :
+`timescale 1ns / 1ps
+//Date : 15/11/2024
+//Name : Charan Kopparla
+
+module tb_pos_edge_detector;
+    reg clk;
+    reg signal;
+    wire edge_detected;
+
+    pos_edge_detector uut (
+        .clk(clk),
+        .signal(signal),
+        .edge_detected(edge_detected)
+    );
+
+    initial begin
+        clk = 0;
+        forever #5 clk = ~clk; // Clock with 10 time units period
+    end
+
+    initial begin
+        signal = 0;
+        #15 signal = 1; // Positive edge at 15
+        #10 signal = 0;
+        #10 signal = 1; // Positive edge at 35
+        #20 signal = 0;
+        #10 signal = 1; // Positive edge at 65
+        #10 signal = 0;
+        #10 $finish;
+    end
+
+    initial begin
+        $monitor("Time: %0t | Signal: %b | Edge Detected: %b", $time, signal, edge_detected);
+    end
+endmodule
+
