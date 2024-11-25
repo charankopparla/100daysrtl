@@ -1,0 +1,99 @@
+RTL CODE :
+`timescale 1ns / 1ps
+//Date : 3/12/2024
+//Name : Charan Kopparla 
+
+module memory_1mb (
+    input wire clk,
+    input wire [19:0] addr,      // 20-bit address for 1MB
+    input wire [31:0] data_in,  // 32-bit data input
+    input wire we,              // Write enable signal
+    output reg [31:0] data_out  // 32-bit data output
+);
+    // Memory array: 2^20 locations, each 32 bits wide
+    reg [31:0] mem_array [0:1048575];
+     integer i;
+
+    initial begin
+        // Initialize memory to zero (optional)
+       
+        for (i = 0; i < 1048576; i = i + 1) begin
+            mem_array[i] = 32'b0;
+        end
+    end
+
+    always @(posedge clk) begin
+        if (we) begin
+            mem_array[addr] <= data_in; // Write data
+        end else begin
+            data_out <= mem_array[addr]; // Read data
+        end
+    end
+endmodule
+
+TEST BENCH :
+`timescale 1ns / 1ps
+//Date : 3/12/2024
+//Name : Charan Kopparla 
+
+
+module tb_memory_1mb;
+    reg clk;
+    reg [19:0] addr;
+    reg [31:0] data_in;
+    reg we;
+    wire [31:0] data_out;
+
+    // Instantiate the memory module
+    memory_1mb uut (
+        .clk(clk),
+        .addr(addr),
+        .data_in(data_in),
+        .we(we),
+        .data_out(data_out)
+    );
+
+    // Clock generation
+    initial clk = 0;
+    always #5 clk = ~clk; // 10ns period
+
+    initial begin
+        // Test sequence
+        $display("Starting memory test...");
+
+        // Test 1: Write to address 0
+        @(posedge clk);
+        we = 1;
+        addr = 20'h00000;
+        data_in = 32'hA5A5A5A5;
+
+        @(posedge clk);
+        we = 0; // Switch to read mode
+        addr = 20'h00000;
+
+        @(posedge clk);
+        $display("Read from address 0: %h (Expected: A5A5A5A5)", data_out);
+
+        // Test 2: Write to address 1
+        @(posedge clk);
+        we = 1;
+        addr = 20'h00001;
+        data_in = 32'h5A5A5A5A;
+
+        @(posedge clk);
+        we = 0; // Switch to read mode
+        addr = 20'h00001;
+
+        @(posedge clk);
+        $display("Read from address 1: %h (Expected: 5A5A5A5A)", data_out);
+
+        // Test 3: Check uninitialized memory
+        @(posedge clk);
+        addr = 20'h00002; // Address with no prior writes
+        $display("Read from uninitialized address 2: %h (Expected: 00000000)", data_out);
+
+        // End simulation
+        $finish;
+    end
+endmodule
+
