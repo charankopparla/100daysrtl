@@ -1,0 +1,51 @@
+RTL CODE :
+`timescale 1ns / 1ps
+//Date : 10/12/2024
+//Name : Charan Kopparla 
+
+module ring_oscillator (
+    output reg osc_out // Oscillator output
+);
+
+   reg[4:0] stage;
+   initial begin 
+    stage = 5'b00001;
+    osc_out = 0;
+    end
+  
+   always begin 
+      #5 stage[0] = ~stage[4];
+      #5 stage[1] = ~stage[0];
+      #5 stage[2] = ~stage[1];
+      #5 stage[3] = ~stage[2];
+      #5 stage[4] = ~stage[3];
+      
+      osc_out = stage[4];
+    end 
+    endmodule 
+
+TEST BENCH :
+`timescale 1ns / 1ps
+//Date : 10/12/2024
+//Name : Charan Kopparla 
+
+
+module tb_ring_oscillator;
+    wire osc_out;
+
+    // Instantiate the ring oscillator
+    ring_oscillator uut (
+        .osc_out(osc_out)
+    );
+
+    initial begin
+        // Monitor osc_out to observe oscillation
+        $monitor($time, " ns: osc_out = %b", osc_out);
+
+        // Run simulation for a specific duration
+        #500 $finish;
+    end
+    
+endmodule
+
+
