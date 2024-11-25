@@ -1,0 +1,65 @@
+RTL CODE :
+`timescale 1ns / 1ps
+// Date : 7/11/2024
+// Name : Charan Kopparla 
+
+module PIPO(
+    input clk,
+    input rst,
+    input [3:0] parallel_in,
+    output reg [3:0] parallel_out
+);
+
+always @(posedge clk or posedge rst) begin
+    if (rst)
+        parallel_out <= 4'b0000;
+    else
+        parallel_out <= parallel_in;
+end
+
+endmodule
+
+TEST BENCH :
+`timescale 1ns / 1ps
+// Date : 7/11/2024
+// Name : Charan Kopparla 
+
+module PIPO_tb();
+    reg clk;
+    reg rst;
+    reg [3:0] parallel_in;
+    wire [3:0] parallel_out;
+
+    PIPO dut (
+        .clk(clk),
+        .rst(rst),
+        .parallel_in(parallel_in),
+        .parallel_out(parallel_out)
+    );
+
+    initial clk = 0;
+    always #5 clk = ~clk;
+
+    initial begin
+        rst = 1;
+        parallel_in = 4'b0000;
+        #10;
+
+        rst = 0;
+        #10;
+
+        parallel_in = 4'b1010; 
+        #10;
+
+        parallel_in = 4'b1100; 
+        #10;
+
+        parallel_in = 4'b0111; 
+        #10;
+
+        parallel_in = 4'b1111; 
+        #10;
+
+        $finish;
+    end
+endmodule
