@@ -1,0 +1,112 @@
+RTL CODE :
+`timescale 1ns / 1ps
+//Date : 26/11/2024
+//Name : Charan Kopparla 
+module GCD_FSM (
+    input clk,           // Clock input
+    input reset,         // Reset input
+    input start,         // Start signal to begin GCD calculation
+    input [7:0] a,       // First input number
+    input [7:0] b,       // Second input number
+    output reg [7:0] gcd, // GCD result
+    output reg done       // Done signal to indicate completion
+);
+
+    reg [7:0] x, y;
+    reg [2:0] state;
+
+    // State encoding
+    localparam IDLE = 3'b000,
+               COMPARE = 3'b001,
+               SUB_X = 3'b010,
+               SUB_Y = 3'b011,
+               DONE = 3'b100;
+
+    // FSM state transitions and output logic
+    always @(posedge clk or posedge reset) begin
+        if (reset) begin
+            state <= IDLE;
+            done <= 0;
+            gcd <= 0;
+        end else begin
+            case (state)
+                IDLE: begin
+                    done <= 0;
+                    if (start) begin
+                        x <= a;
+                        y <= b;
+                        state <= COMPARE;
+                    end
+                end
+                COMPARE: begin
+                    if (x == y) begin
+                        gcd <= x;
+                        state <= DONE;
+                    end else if (x > y) begin
+                        state <= SUB_X;
+                    end else begin
+                        state <= SUB_Y;
+                    end
+                end
+                SUB_X: begin
+                    x <= x - y;
+                    state <= COMPARE;
+                end
+                SUB_Y: begin
+                    y <= y - x;
+                    state <= COMPARE;
+                end
+                DONE: begin
+                    done <= 1;
+                    state <= IDLE;
+                end
+            endcase
+        end
+    end
+endmodule
+
+
+TEST BENCH :
+`timescale 1ns / 1ps
+//Date : 26/11/2024
+//Name : Charan Kopparla 
+
+module GCD_FSM_tb;
+
+    reg clk;
+    reg reset;
+    reg start;
+    reg [7:0] a, b;
+    wire [7:0] gcd;
+    wire done;
+
+    // Instantiate the GCD FSM module
+    GCD_FSM uut (
+        .clk(clk),
+        .reset(reset),
+        .start(start),
+        .a(a),
+        .b(b),
+        .gcd(gcd),
+        .done(done)
+    );
+
+    initial begin
+        clk = 0;
+        forever #5 clk = ~clk;
+    end
+
+    initial begin
+        reset = 1; start = 0; a = 8'd56; b = 8'd98; #10;
+        reset = 0; start = 1; #10; start = 0;
+        wait(done); #10;
+
+        a = 8'd20; b = 8'd30; start = 1; #10; start = 0;
+        wait(done); #10;
+        $finish;
+    end
+
+    initial begin
+        $monitor("Time=%0d a=%d b=%d gcd=%d done=%b", $time, a, b, gcd, done);
+    end
+endmodule
